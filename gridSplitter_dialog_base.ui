@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Grid Splicer</string>
+   <string>Grid Splitter</string>
   </property>
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
@@ -157,7 +157,7 @@
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>Tiles X</string>
+         <string>number of tiles in X axis</string>
         </property>
        </widget>
       </item>
@@ -167,7 +167,7 @@
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>Tiles Y</string>
+         <string>number of tiles in Y axis</string>
         </property>
        </widget>
       </item>
@@ -177,7 +177,7 @@
       <item row="6" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>prefix for output files:</string>
+         <string>prefix for output files (otional):</string>
         </property>
        </widget>
       </item>
@@ -208,7 +208,7 @@
       <locale language="English" country="UnitedStates"/>
      </property>
      <property name="text">
-      <string>Version 0.1. Please report errors to maximilian.krambach@gmx.de</string>
+      <string>Version 0.2. Please report errors to maximilian.krambach@gmx.de</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -273,7 +273,7 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_13">
         <property name="text">
-         <string>Temporary file: a non.existing file to store temporary informations, as some algorithm doesn't seem to accept memory layers</string>
+         <string>Temporary file: a non-existing file to store temporary informations, as some algorithm doesn't seem to accept memory layers</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

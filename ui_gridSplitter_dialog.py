@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gridSplitter_dialog_base.ui'
 #
-# Created: Fri Mar 27 14:23:40 2015
+# Created: Fri Mar 27 14:45:40 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -147,19 +147,19 @@ class Ui_gridSplicerDialogBase(object):
         QtCore.QMetaObject.connectSlotsByName(gridSplicerDialogBase)
 
     def retranslateUi(self, gridSplicerDialogBase):
-        gridSplicerDialogBase.setWindowTitle(_translate("gridSplicerDialogBase", "Grid Splicer", None))
+        gridSplicerDialogBase.setWindowTitle(_translate("gridSplicerDialogBase", "Grid Splitter", None))
         self.label_6.setText(_translate("gridSplicerDialogBase", "Output Base Directory", None))
         self.label_3.setText(_translate("gridSplicerDialogBase", "Input Layer:", None))
         self.label_7.setText(_translate("gridSplicerDialogBase", "temporary file", None))
         self.cmdBrowseOutput.setText(_translate("gridSplicerDialogBase", "Browse", None))
         self.cmdBrowsetmp.setText(_translate("gridSplicerDialogBase", "Browse", None))
         self.tempFile.setText(_translate("gridSplicerDialogBase", "/tmp/tempshape.shp", None))
-        self.label_4.setText(_translate("gridSplicerDialogBase", "Tiles X", None))
-        self.label_5.setText(_translate("gridSplicerDialogBase", "Tiles Y", None))
-        self.label_8.setText(_translate("gridSplicerDialogBase", "prefix for output files:", None))
+        self.label_4.setText(_translate("gridSplicerDialogBase", "number of tiles in X axis", None))
+        self.label_5.setText(_translate("gridSplicerDialogBase", "number of tiles in Y axis", None))
+        self.label_8.setText(_translate("gridSplicerDialogBase", "prefix for output files (otional):", None))
         self.addTiles.setText(_translate("gridSplicerDialogBase", "Add tiles to canvas", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("gridSplicerDialogBase", "Parameters", None))
-        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.1. Please report errors to maximilian.krambach@gmx.de", None))
+        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.2. Please report errors to maximilian.krambach@gmx.de", None))
         self.label.setText(_translate("gridSplicerDialogBase", "gridSplitter cuts your input layer into tilesX * tilesY pieces.\n"
 "If it is a raster, it tries to keep the raster\'s resolution to avoid gaps and overlaps.\n"
 "If the number of splices and the resolution don\'t match up, it cuts slightly larger tiles, resulting in the last tile having a bit of \"no Data\".\n"
@@ -170,7 +170,7 @@ class Ui_gridSplicerDialogBase(object):
         self.label_10.setText(_translate("gridSplicerDialogBase", "TilesX, TilesY: The number of tiles you want to create for this axis.", None))
         self.label_11.setText(_translate("gridSplicerDialogBase", "Output Base Directory: Where you want your output to be stored. gridSplitter will make subdirectories for each tile", None))
         self.label_12.setText(_translate("gridSplicerDialogBase", "Prefix for output files (optional): To give the ouput files a better name than [tileX]_[tiley]", None))
-        self.label_13.setText(_translate("gridSplicerDialogBase", "Temporary file: a non.existing file to store temporary informations, as some algorithm doesn\'t seem to accept memory layers", None))
+        self.label_13.setText(_translate("gridSplicerDialogBase", "Temporary file: a non-existing file to store temporary informations, as some algorithm doesn\'t seem to accept memory layers", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("gridSplicerDialogBase", "Info", None))
 
 from qgis import gui
