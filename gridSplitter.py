@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
 from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources_rc
@@ -200,12 +200,19 @@ class gridSplitter:
 				gridtmp.commitChanges()
 				#write it to tempfile. Needed, because gdalogr doesn't seem to accept memory layer?
 				writer = QgsVectorFileWriter.writeAsVectorFormat(gridtmp, tempfile,"utf-8",crs,"ESRI Shapefile")
-				folderj= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
-				if not os.path.exists(folderj):
-				    os.makedirs(folderj)
+				folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
+				if not os.path.exists(folder):
+				    os.makedirs(folder)
 				
-				processing.runalg('gdalogr:cliprasterbymasklayer', rastermap, tempfile , None, False, False, "",folderj +pref + str(i)+"_"+str(j)+".tif")
+				processing.runalg('gdalogr:cliprasterbymasklayer', rastermap, tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
 				
+				if self.dlg.addTiles.isChecked()== True:
+				  #add raster layer to canvas
+				  fileInfo = QFileInfo(folder +pref + str(i)+"_"+str(j)+".tif")
+				  baseName = fileInfo.baseName()
+				  layer = QgsRasterLayer(folder +pref + str(i)+"_"+str(j)+".tif", baseName)
+				  QgsMapLayerRegistry.instance().addMapLayer(layer)
+ 				
 				#clean up
 				QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
 				if os.path.isfile(tempfile):
@@ -233,12 +240,16 @@ class gridSplitter:
 			      gridtmp.commitChanges()
 			      #write it to tempfile
 			      writer = QgsVectorFileWriter.writeAsVectorFormat(gridtmp, tempfile,"utf-8",crs,"ESRI Shapefile")
-			      folderj= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
-			      if not os.path.exists(folderj):
-				os.makedirs(folderj)
-			      
-			      processing.runalg('qgis:intersection', rastermap, tempfile , folderj+ pref +str(i)+"_"+str(j)+".shp")
-			      
+			      folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
+			      if not os.path.exists(folder):
+				os.makedirs(folder)
+	      
+			      processing.runalg('qgis:intersection', rastermap, tempfile , folder+ pref +str(i)+"_"+str(j)+".shp")
+
+			      if self.dlg.addTiles.isChecked()== True:
+				layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
+				QgsMapLayerRegistry.instance().addMapLayer(layer)
+				
 			      #clean up
 			      QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
 			      if os.path.isfile(tempfile):

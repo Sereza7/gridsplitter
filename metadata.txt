@@ -24,9 +24,9 @@ email=maximilian.krambach@gmx.de
 # Tags are comma separated with spaces allowed
 tags=tiles, raster, vector
 
-homepage=http://krambach.de/gridsplitter
+homepage=krambach.de/gridsplitter
 tracker=http://hub.qgis.org/projects/gridsplitter
-repository=https://github.com/matakuka/gridsplitter
+repository=
 category=Plugins
 icon=icon.png
 # experimental flag
