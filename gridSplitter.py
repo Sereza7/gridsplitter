@@ -287,8 +287,8 @@ class gridSplitter:
                                             xsplice = tilesizeX
                                             splicesX = math.ceil((xmax-xmin)/float(tilesizeX))
                                             splicesY = math.ceil((ymax-ymin)/float(tilesizeY))
-                                        #iterate
-                                        for i in range(splicesX):
+                                    #iterate
+                                    for i in range(splicesX):
                                             for j in range(splicesY):
                                                 xsplmin= xmin + i*xsplice
                                                 xsplmax= xmin + (i+1)*xsplice
