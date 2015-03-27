@@ -26,7 +26,7 @@ tags=tiles, raster, vector
 
 homepage=krambach.de/gridsplitter
 tracker=http://hub.qgis.org/projects/gridsplitter
-repository=
+repository=https://github.com/matakuka/gridsplitter
 category=Plugins
 icon=icon.png
 # experimental flag
