@@ -1,11 +1,11 @@
 
-Welcome to gridSplicer's documentation!
+Welcome to gridSplitter's documentation!
 ============================================
 
 Concept
 =================
 
-The gridSplicer is written to cleanly cut input features. It is a wrapper for gdalogr/cliprasterbymasklayer
+The gridSplitter is written to cleanly cut input features. It is a wrapper for gdalogr/cliprasterbymasklayer
 and qgis:intersection. It takes the extent of the input data, divides it by a number of pieces and saves 
 those pieces to an output directory and subdirectories. It aims to be functional in any coordinate reference 
 system and with any number of pieces (or tiles). It saves its outputs in .TIF and .shp, respectively.
@@ -37,3 +37,4 @@ Optional Parameters
 
 :prefix: The prefix output files will have.
 
+:add to map layer: The layers created will be loaded into QGIS.
