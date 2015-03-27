@@ -286,8 +286,9 @@ class gridSplitter:
                                         #if tile size is given
                                         if self.dlg.tileSizeRadio.isChecked():
                                             xsplice = tilesizeX
-                                            splicesX = math.ceil((xmax-xmin)/float(tilesizeX))
-                                            splicesY = math.ceil((ymax-ymin)/float(tilesizeY))
+                                            ysplice = tilesizeY
+                                            splicesX = int(math.ceil((xmax-xmin)/float(tilesizeX)))
+                                            splicesY = int(math.ceil((ymax-ymin)/float(tilesizeY)))
                                     #iterate
                                     for i in range(splicesX):
                                             for j in range(splicesY):
