@@ -20,16 +20,13 @@ Required Parameters
 ...................
 :Input Layer: The layer to be processed. Can be a raster or a vector layer.
 
-:Number of tiles X: Numbers of pieces/tiles in X direction
-
-:Number of tiles Y: Numbers of pieces/tiles in X direction
-
 :Output Dir: Base Directory where the output will be stored. Subdirectories will be created which indicate
 the tiles.
 
 :temporary file: Since the algorithm can't process an in-memory layer, a temporary shapefile will be created 
 and deleted at the end, used for iterations.
 
+:Method: One of the methods has to be selected (See below).
 
 
 Optional Parameters
@@ -38,3 +35,19 @@ Optional Parameters
 :prefix: The prefix output files will have.
 
 :add to map layer: The layers created will be loaded into QGIS.
+
+Methods
+================
+gridSplitter offers three methods for splitting. Cutting by tile number, cutting by tile size, and cutting by layer feature,
+
+Cutting by tile number:
+
+Select the number of tiles in X axis and Y axis, and it will calculate how big a tile needs to be.
+
+Cutting by tile size:
+
+Enter size in map units for both axis and it will calculate the number of tiles needed.
+
+Cutting by Layer:
+
+A tile for every feature will be created.
