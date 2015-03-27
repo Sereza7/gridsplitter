@@ -1,0 +1,37 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=gridSplitter
+qgisMinimumVersion=2.0
+description=A plugin that cuts a layer into pieces(tiles)
+version=0.1
+author=Maximilian Krambach
+email=maximilian.krambach@gmx.de
+
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=tiles, raster, vector
+
+homepage=http://krambach.de/gridsplitter
+tracker=http://hub.qgis.org/projects/gridsplitter
+repository=https://github.com/matakuka/gridsplitter
+category=Plugins
+icon=icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
