@@ -211,6 +211,7 @@ class gridSplitter:
                         else:
                             if not os.path.exists(outputfolder):
                                 os.makedirs(outputfolder)
+                            ext = layertocut.extent()
                             xmax = layertocut.extent().xMaximum()
                             xmin = layertocut.extent().xMinimum()
                             ymax = layertocut.extent().yMaximum()
@@ -238,7 +239,7 @@ class gridSplitter:
                                         xsplice = math.ceil(float(tilesizeX)/xres) * xres  
                                         ysplice = math.ceil(float(tilesizeY)/xres) * yres
                                         splicesX = int(math.ceil((xmax -xmin)/ float(xsplice)))
-                                        splicesY = int(math.ceil((xmax -xmin)/ float(ysplice)))
+                                        splicesY = int(math.ceil((ymax -ymin)/ float(ysplice)))
                                 #iterate
                                 for i in range(splicesX):
                                     for j in range(splicesY):
@@ -279,7 +280,7 @@ class gridSplitter:
                                 if layertocut.type()== QgsMapLayer.VectorLayer:
                                     #if tile number is given
                                     if self.dlg.numberTilesRadio.isChecked():
-                                        xsplice = (ymax - ymin)/splicesX
+                                        xsplice = (xmax - xmin)/splicesX
                                         ysplice = (ymax - ymin)/splicesY
                                     else:
                                         #if tile size is given
