@@ -244,7 +244,7 @@ class gridSplitter:
 			      if not os.path.exists(folder):
 				os.makedirs(folder)
 	      
-			      processing.runalg('qgis:intersection', rastermap, tempfile , folder+ pref +str(i)+"_"+str(j)+".shp")
+			      processing.runalg('qgis:intersection', rastermap, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
 
 			      if self.dlg.addTiles.isChecked()== True:
 				layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
