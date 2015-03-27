@@ -138,6 +138,7 @@ class gridSplitter:
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
+        #run if "okay"
         if result:
             #get parameters from GUI
             outputfolder = self.dlg.OuptDir.text()
@@ -148,6 +149,7 @@ class gridSplitter:
             layertocut = self.dlg.inputRasterBox.currentLayer()
             tempfile = self.dlg.tempFile.text()
             pref = self.dlg.prefixx.text()
+            #run checks
             if layertocut != "":
               if outputfolder!="":
               #TODO: check if it is a valid path
@@ -157,13 +159,14 @@ class gridSplitter:
                         pass
                     else: 
                         tempfile= tempfile + ".shp"
+                    #temp shape must not exist on the system
                     if os.path.isfile(tempfile) == True:
                         QMessageBox.information(None,"Shapefile exists!", "Please specify a shapefile that doesn't exist. The shapefile will be overwritten and deleted")
                     else:
                         #now everything is checked, run the code
                         chekk="1" #to end the GUI loop after everything is done
                         if self.dlg.cutLayerRadio.isChecked():
-                            #do cutlayer stuff
+                            #option: cut by Cutlayer
                             cutlayer = self.dlg.cutLayerBox.currentLayer()
                             if cutlayer != "":
                                 if not os.path.exists(outputfolder):
@@ -171,9 +174,11 @@ class gridSplitter:
                                 iter = cutlayer.getFeatures()
                                 crs= layertocut.crs()   
                                 ext = layertocut.extent()
+                                #do iterations over every feature
                                 for feature in iter:
                                     i= feature.id()
                                     if feature.geometry().intersects(ext):
+				        #make temporary file
                                         tmpf= "Polygon?crs="+ crs.authid()
                                         gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
                                         QgsMapLayerRegistry.instance().addMapLayer(gridtmp)
@@ -188,19 +193,26 @@ class gridSplitter:
                                         folder= outputfolder + os.sep + str(i)+ os.sep
                                         if not os.path.exists(folder):
                                             os.makedirs(folder)
+                                        
+                                        #run for raster layer
                                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile, None, False, False, "",folder +pref + str(i)+ ".tif")
-                                            #add raster layer to canvas
-                                            fileInfo = QFileInfo(folder +pref + str(i)+".tif")
-                                            baseName = fileInfo.baseName()
-                                            layer = QgsRasterLayer(folder +pref + str(i)+".tif", baseName)
-                                            QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                          processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile, None, False, False, "",folder +pref + str(i)+ ".tif")
+                                          
+                                          if self.dlg.addTiles.isChecked()== True:  
+					    #add raster layer to canvas
+					    fileInfo = QFileInfo(folder +pref + str(i)+".tif")
+					    baseName = fileInfo.baseName()
+					    layer = QgsRasterLayer(folder +pref + str(i)+".tif", baseName)
+					    QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                        
+                                        #run for vector layer
                                         else:
                                             if layertocut.type()== QgsMapLayer.VectorLayer:
                                                 processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+".shp")
                                             if self.dlg.addTiles.isChecked()== True:
                                                 layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
                                                 QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                        
                                         #clean up
                                         QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
                                         if os.path.isfile(tempfile):
@@ -208,6 +220,7 @@ class gridSplitter:
                                     
                             else:
                                 QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
+                        #option:cut by tile
                         else:
                             if not os.path.exists(outputfolder):
                                 os.makedirs(outputfolder)
@@ -217,15 +230,12 @@ class gridSplitter:
                             ymax = layertocut.extent().yMaximum()
                             ymin = layertocut.extent().yMinimum()
                             crs= layertocut.crs()
+                            #if raster layer, get extents and calculate so it doesn't cut pixels. Make the tiles up to one pixel larger if they cut
                             if layertocut.type()== QgsMapLayer.RasterLayer:
                                 rwidth = layertocut.width()
                                 rheight = layertocut.height()
                                 xres = (xmax-xmin)/rwidth
                                 yres = (ymax-ymin)/rheight
-                                #determine tile size, add empty pixels if it doesn't sum up,
-                                #making the result stlightly larger. 
-                                #make sure that each tile is in the resolution of 
-                                #raster, to avoid gaps
                                 #if tile number is given
                                 if self.dlg.numberTilesRadio.isChecked():
                                     ixx= float(rwidth)/splicesX
@@ -265,8 +275,10 @@ class gridSplitter:
                                             os.makedirs(folder)
                           
                                         processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                                        
+                                        #add raster layer to canvas
                                         if self.dlg.addTiles.isChecked()== True:
-                                            #add raster layer to canvas
+                                            
                                             fileInfo = QFileInfo(folder +pref + str(i)+"_"+str(j)+".tif")
                                             baseName = fileInfo.baseName()
                                             layer = QgsRasterLayer(folder +pref + str(i)+"_"+str(j)+".tif", baseName)
@@ -276,6 +288,7 @@ class gridSplitter:
                                         QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
                                         if os.path.isfile(tempfile):
                                             QgsVectorFileWriter.deleteShapeFile(tempfile)           
+                            #option cut by tile, vector layer
                             else:
                                 if layertocut.type()== QgsMapLayer.VectorLayer:
                                     #if tile number is given
@@ -314,6 +327,8 @@ class gridSplitter:
                                                     os.makedirs(folder)
                     
                                                 processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                                                
+                                                #add to canvas
                                                 if self.dlg.addTiles.isChecked()== True:
                                                     layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
                                                     QgsMapLayerRegistry.instance().addMapLayer(layer)
@@ -334,4 +349,4 @@ class gridSplitter:
                 QMessageBox.information(None, "Grid Splitter", "Please specify raster")
             
         else:
-            chekk="1" #end loop on "cancel button"
+            chekk="1" #end GUI loop if anything other than "okay" returns
