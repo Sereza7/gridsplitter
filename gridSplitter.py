@@ -197,9 +197,9 @@ class gridSplitter:
                                             QgsMapLayerRegistry.instance().addMapLayer(layer)
                                         else:
                                             if layertocut.type()== QgsMapLayer.VectorLayer:
-                                                processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                                                processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+".shp")
                                             if self.dlg.addTiles.isChecked()== True:
-                                                layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
+                                                layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
                                                 QgsMapLayerRegistry.instance().addMapLayer(layer)
                                         #clean up
                                         QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
