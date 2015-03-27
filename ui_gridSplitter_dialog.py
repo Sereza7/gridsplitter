@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gridSplitter_dialog_base.ui'
 #
-# Created: Fri Mar 27 14:45:40 2015
+# Created: Fri Mar 27 15:18:15 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -107,7 +107,7 @@ class Ui_gridSplicerDialogBase(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.label_2 = QtGui.QLabel(self.tab_2)
-        self.label_2.setGeometry(QtCore.QRect(60, 430, 391, 16))
+        self.label_2.setGeometry(QtCore.QRect(20, 430, 501, 20))
         self.label_2.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.layoutWidget1 = QtGui.QWidget(self.tab_2)
@@ -141,7 +141,7 @@ class Ui_gridSplicerDialogBase(object):
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
 
         self.retranslateUi(gridSplicerDialogBase)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QObject.connect(self.button_box, QtCore.SIGNAL(_fromUtf8("accepted()")), gridSplicerDialogBase.accept)
         QtCore.QObject.connect(self.button_box, QtCore.SIGNAL(_fromUtf8("rejected()")), gridSplicerDialogBase.reject)
         QtCore.QMetaObject.connectSlotsByName(gridSplicerDialogBase)
@@ -159,7 +159,7 @@ class Ui_gridSplicerDialogBase(object):
         self.label_8.setText(_translate("gridSplicerDialogBase", "prefix for output files (otional):", None))
         self.addTiles.setText(_translate("gridSplicerDialogBase", "Add tiles to canvas", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("gridSplicerDialogBase", "Parameters", None))
-        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.2. Please report errors to maximilian.krambach@gmx.de", None))
+        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.2. Please report errors to http://hub.qgis.org/projects/gridsplitter", None))
         self.label.setText(_translate("gridSplicerDialogBase", "gridSplitter cuts your input layer into tilesX * tilesY pieces.\n"
 "If it is a raster, it tries to keep the raster\'s resolution to avoid gaps and overlaps.\n"
 "If the number of splices and the resolution don\'t match up, it cuts slightly larger tiles, resulting in the last tile having a bit of \"no Data\".\n"
