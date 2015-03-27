@@ -10,7 +10,7 @@
 name=gridSplitter
 qgisMinimumVersion=2.0
 description=A plugin that cuts a layer into pieces(tiles)
-version=0.2
+version=0.3
 author=Maximilian Krambach
 email=maximilian.krambach@gmx.de
 

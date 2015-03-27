@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>545</height>
+    <width>574</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,13 +36,13 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
-     <width>551</width>
+     <y>10</y>
+     <width>571</width>
      <height>481</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -51,27 +51,14 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>40</y>
-       <width>501</width>
-       <height>381</height>
+       <x>6</x>
+       <y>20</y>
+       <width>551</width>
+       <height>391</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="3">
-       <widget class="QgsSpinBox" name="splicesXSpinBox">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
+      <item row="8" column="0">
        <widget class="QLabel" name="label_6">
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
@@ -91,7 +78,124 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
+      <item row="11" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>temporary file</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="4">
+       <widget class="QPushButton" name="cmdBrowseOutput">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="4">
+       <widget class="QPushButton" name="cmdBrowsetmp">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QLineEdit" name="OuptDir"/>
+      </item>
+      <item row="11" column="2">
+       <widget class="QLineEdit" name="tempFile">
+        <property name="text">
+         <string>/tmp/tempshape.shp</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QgsMapLayerComboBox" name="inputRasterBox">
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="filters">
+         <set>QgsMapLayerProxyModel::All|QgsMapLayerProxyModel::HasGeometry|QgsMapLayerProxyModel::LineLayer|QgsMapLayerProxyModel::PluginLayer|QgsMapLayerProxyModel::PointLayer|QgsMapLayerProxyModel::PolygonLayer|QgsMapLayerProxyModel::RasterLayer</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="label_4">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>number of tiles (X axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2">
+       <widget class="QLineEdit" name="prefixx"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>prefix for output files:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QCheckBox" name="addTiles">
+        <property name="text">
+         <string>Add tiles to canvas</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>tile size (Y axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QgsSpinBox" name="splicesXSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>tile size (X axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="4">
+       <widget class="QgsDoubleSpinBox" name="tileSizeY">
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
        <widget class="QgsSpinBox" name="splicesYSpinBox">
         <property name="minimum">
          <number>1</number>
@@ -104,87 +208,64 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>temporary file</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QPushButton" name="cmdBrowseOutput">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="3">
-       <widget class="QPushButton" name="cmdBrowsetmp">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="OuptDir"/>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLineEdit" name="tempFile">
-        <property name="text">
-         <string>/tmp/tempshape.shp</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QgsMapLayerComboBox" name="inputRasterBox">
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="label_4">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>number of tiles in X axis</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
+      <item row="4" column="2">
        <widget class="QLabel" name="label_5">
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>number of tiles in Y axis</string>
+         <string>number of tiles (Y axis)</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="prefixx"/>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>prefix for output files (otional):</string>
+      <item row="7" column="2">
+       <widget class="QgsMapLayerComboBox" name="cutLayerBox">
+        <property name="filters">
+         <set>QgsMapLayerProxyModel::PolygonLayer</set>
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <widget class="QCheckBox" name="addTiles">
+      <item row="5" column="4">
+       <widget class="QgsDoubleSpinBox" name="tileSizeX">
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QRadioButton" name="numberTilesRadio">
         <property name="text">
-         <string>Add tiles to canvas</string>
+         <string>number of tiles</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QRadioButton" name="tileSizeRadio">
+        <property name="text">
+         <string>tile size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QRadioButton" name="cutLayerRadio">
+        <property name="text">
+         <string>cut layer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Method:</string>
         </property>
        </widget>
       </item>
@@ -208,16 +289,16 @@
       <locale language="English" country="UnitedStates"/>
      </property>
      <property name="text">
-      <string>Version 0.2. Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
+      <string>Version 0.3. Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>13</y>
-       <width>531</width>
-       <height>381</height>
+       <x>1</x>
+       <y>14</y>
+       <width>541</width>
+       <height>411</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -249,7 +330,30 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>TilesX, TilesY: The number of tiles you want to create for this axis.</string>
+         <string>Number of tiles: Specify number of equal tiles you want to create</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Tile size: Specify how big the individual tiles will be in map units. They will be snapped to raster resolution</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -287,6 +391,11 @@ Vector layers will be stored in shapefile format.</string>
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QgsDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>qgsdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
    <class>QgsMapLayerComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
@@ -297,6 +406,25 @@ Vector layers will be stored in shapefile format.</string>
    <header>qgsspinbox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>inputRasterBox</tabstop>
+  <tabstop>numberTilesRadio</tabstop>
+  <tabstop>splicesXSpinBox</tabstop>
+  <tabstop>splicesYSpinBox</tabstop>
+  <tabstop>tileSizeRadio</tabstop>
+  <tabstop>tileSizeX</tabstop>
+  <tabstop>tileSizeY</tabstop>
+  <tabstop>cutLayerRadio</tabstop>
+  <tabstop>cutLayerBox</tabstop>
+  <tabstop>OuptDir</tabstop>
+  <tabstop>cmdBrowseOutput</tabstop>
+  <tabstop>prefixx</tabstop>
+  <tabstop>addTiles</tabstop>
+  <tabstop>tempFile</tabstop>
+  <tabstop>cmdBrowsetmp</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>button_box</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
