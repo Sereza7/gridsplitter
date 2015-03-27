@@ -130,9 +130,9 @@ class gridSplitter:
 
 
     def run(self):
-      """Run method that performs all the real work"""
+      #TODO show a warning if output files exist, they won't be overwritten.
       # show the dialog
-      #loop for the GUI until each required parameter is checked
+      #loop the GUI until each required parameter is checked
       chekk="0"
       while chekk != "1": 
 	  self.dlg.show()
@@ -143,10 +143,10 @@ class gridSplitter:
 	    outputfolder = self.dlg.OuptDir.text()
 	    splicesX = int(self.dlg.splicesXSpinBox.text())
 	    splicesY = int(self.dlg.splicesYSpinBox.text())
-	    rastermap = self.dlg.inputRasterBox.currentLayer()
+	    layertocut = self.dlg.inputRasterBox.currentLayer()
 	    tempfile = self.dlg.tempFile.text()
 	    pref = self.dlg.prefixx.text()
-	    if rastermap != "":
+	    if layertocut != "":
 	     if outputfolder!="":
 		#TODO: check if it is a valid path
 		  if tempfile !="":
@@ -158,23 +158,23 @@ class gridSplitter:
 		      QMessageBox.information(None,"Shapefile exists!", "Please specify a shapefile that doesn't exist. The shapefile will be overwritten and deleted")
 		    else:
 		      #now everything is checked, run the code
-		      chekk="1" #to end the GUI loop
+		      chekk="1" #to end the GUI loop after everything is done
 		      if not os.path.exists(outputfolder):
 			os.makedirs(outputfolder)
-		      xmax = rastermap.extent().xMaximum()
-		      xmin = rastermap.extent().xMinimum()
-		      ymax = rastermap.extent().yMaximum()
-		      ymin = rastermap.extent().yMinimum()
-		      crs= rastermap.crs()
+		      xmax = layertocut.extent().xMaximum()
+		      xmin = layertocut.extent().xMinimum()
+		      ymax = layertocut.extent().yMaximum()
+		      ymin = layertocut.extent().yMinimum()
+		      crs= layertocut.crs()
 		      
-		      if rastermap.type()== QgsMapLayer.RasterLayer:
-			  rwidth = rastermap.width()
-			  rheight = rastermap.height()
+		      if layertocut.type()== QgsMapLayer.RasterLayer:
+			  rwidth = layertocut.width()
+			  rheight = layertocut.height()
 			  xres = (xmax-xmin)/rwidth
 			  yres = (ymax-ymin)/rheight
-			  #determine slice size, add empty pixels if it doesn't sum up,
+			  #determine tile size, add empty pixels if it doesn't sum up,
 			  #making the result stlightly larger. 
-			  #make sure that each slice pixel is in the resolution of 
+			  #make sure that each tile is in the resolution of 
 			  #raster, to avoid gaps
 			  ixx= float(rwidth)/splicesX
 			  iyy= float(rheight)/splicesY
@@ -204,7 +204,7 @@ class gridSplitter:
 				if not os.path.exists(folder):
 				    os.makedirs(folder)
 				
-				processing.runalg('gdalogr:cliprasterbymasklayer', rastermap, tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+				processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
 				
 				if self.dlg.addTiles.isChecked()== True:
 				  #add raster layer to canvas
@@ -218,7 +218,7 @@ class gridSplitter:
 				if os.path.isfile(tempfile):
 				    QgsVectorFileWriter.deleteShapeFile(tempfile)           
 		      else:
-			if rastermap.type()== QgsMapLayer.VectorLayer:
+			if layertocut.type()== QgsMapLayer.VectorLayer:
 			  xsplice = (ymax - ymin)/splicesX
 			  ysplice = (ymax - ymin)/splicesX
 			  for i in range(splicesX):
@@ -244,7 +244,7 @@ class gridSplitter:
 			      if not os.path.exists(folder):
 				os.makedirs(folder)
 	      
-			      processing.runalg('qgis:intersection', rastermap, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+			      processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
 
 			      if self.dlg.addTiles.isChecked()== True:
 				layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
