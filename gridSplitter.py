@@ -32,9 +32,6 @@ import processing
 import os
 import math
 
-
-
-
 class gridSplitter:
     """QGIS Plugin Implementation."""
 
@@ -45,10 +42,7 @@ class gridSplitter:
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'gridSplitter_{}.qm'.format(locale))
+        locale_path = os.path.join(self.plugin_dir,'i18n','gridSplitter_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -129,224 +123,224 @@ class gridSplitter:
         del self.toolbar
 
 
-    def run(self):
-     #TODO show a warning if output files exist, they won't be overwritten.
-     # show the dialog
-     #loop the GUI until each required parameter is checked
-     chekk="0"
-     while chekk != "1": 
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        #run if "okay"
-        if result:
-            #get parameters from GUI
-            outputfolder = self.dlg.OuptDir.text()
-            splicesX = int(self.dlg.splicesXSpinBox.text())
-            splicesY = int(self.dlg.splicesYSpinBox.text())
-            tilesizeX= float(self.dlg.tileSizeX.value())
-            tilesizeY= float(self.dlg.tileSizeY.value())
-            layertocut = self.dlg.inputRasterBox.currentLayer()
-            tempfile = self.dlg.tempFile.text()
-            pref = self.dlg.prefixx.text()
-            #run checks
-            if layertocut != "":
-              if outputfolder!="":
-              #TODO: check if it is a valid path
-                #check if tempfile is empty
+    def checkempties(self):
+        #check if some inputs aren't valid
+        outputfolder = self.dlg.OuptDir.text()
+        layertocut = self.dlg.inputRasterBox.currentLayer()
+        tempfile = self.dlg.tempFile.text()
+        if layertocut!= "":
+            if outputfolder!="":
                 if tempfile !="":
                     if tempfile.upper().endswith(".SHP"):
                         pass
                     else: 
                         tempfile= tempfile + ".shp"
-                    #temp shape must not exist on the system
                     if os.path.isfile(tempfile) == True:
                         QMessageBox.information(None,"Shapefile exists!", "Please specify a shapefile that doesn't exist. The shapefile will be overwritten and deleted")
-                    else:
-                        #now everything is checked, run the code
-                        chekk="1" #to end the GUI loop after everything is done
-                        if self.dlg.cutLayerRadio.isChecked():
-                            #option: cut by Cutlayer
+                        return "0"
+                    else: 
+                        if self.dlg.cutLayerRadio.isChecked(): #check for "cutlayer if this is the option
                             cutlayer = self.dlg.cutLayerBox.currentLayer()
-                            if cutlayer != "":
-                                if not os.path.exists(outputfolder):
-                                    os.makedirs(outputfolder)
-                                iter = cutlayer.getFeatures()
-                                crs= layertocut.crs()   
-                                ext = layertocut.extent()
-                                #do iterations over every feature
-                                for feature in iter:
-                                    i= feature.id()
-                                    if feature.geometry().intersects(ext):
-				        #make temporary file
-                                        tmpf= "Polygon?crs="+ crs.authid()
-                                        gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
-                                        QgsMapLayerRegistry.instance().addMapLayer(gridtmp)
-                                        gridtmp.startEditing()
-                                        fet = QgsFeature()
-                                        pr= gridtmp.dataProvider()
-                                        fet.setGeometry(feature.geometry())
-                                        pr.addFeatures( [ fet ] )
-                                        gridtmp.commitChanges()
-                                        #write it to tempfile
-                                        writer = QgsVectorFileWriter.writeAsVectorFormat(gridtmp, tempfile,"utf-8",crs,"ESRI Shapefile")
-                                        folder= outputfolder + os.sep + str(i)+ os.sep
-                                        if not os.path.exists(folder):
-                                            os.makedirs(folder)
-                                        
-                                        #run for raster layer
-                                        if layertocut.type()== QgsMapLayer.RasterLayer:
-                                          processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile, None, False, False, "",folder +pref + str(i)+ ".tif")
-                                          
-                                          if self.dlg.addTiles.isChecked()== True:  
-					    #add raster layer to canvas
-					    fileInfo = QFileInfo(folder +pref + str(i)+".tif")
-					    baseName = fileInfo.baseName()
-					    layer = QgsRasterLayer(folder +pref + str(i)+".tif", baseName)
-					    QgsMapLayerRegistry.instance().addMapLayer(layer)
-                                        
-                                        #run for vector layer
-                                        else:
-                                            if layertocut.type()== QgsMapLayer.VectorLayer:
-                                                processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+".shp")
-                                            if self.dlg.addTiles.isChecked()== True:
-                                                layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
-                                                QgsMapLayerRegistry.instance().addMapLayer(layer)
-                                        
-                                        #clean up
-                                        QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
-                                        if os.path.isfile(tempfile):
-                                            QgsVectorFileWriter.deleteShapeFile(tempfile)
-                                    
-                            else:
+                            if cutlayer != "": #check if cutlayer exists
+                                return "1"
+                            else: #if cutlayer does not exist
                                 QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
-                        #option:cut by tile
-                        else:
-                            if not os.path.exists(outputfolder):
-                                os.makedirs(outputfolder)
-                            ext = layertocut.extent()
-                            xmax = layertocut.extent().xMaximum()
-                            xmin = layertocut.extent().xMinimum()
-                            ymax = layertocut.extent().yMaximum()
-                            ymin = layertocut.extent().yMinimum()
-                            crs= layertocut.crs()
-                            #if raster layer, get extents and calculate so it doesn't cut pixels. Make the tiles up to one pixel larger if they cut
-                            if layertocut.type()== QgsMapLayer.RasterLayer:
-                                rwidth = layertocut.width()
-                                rheight = layertocut.height()
-                                xres = (xmax-xmin)/rwidth
-                                yres = (ymax-ymin)/rheight
-                                #if tile number is given
-                                if self.dlg.numberTilesRadio.isChecked():
-                                    ixx= float(rwidth)/splicesX
-                                    iyy= float(rheight)/splicesY
-                                    xsplice = math.ceil(ixx) * xres
-                                    ysplice = math.ceil(iyy) * yres
-                                #if tile size is given
-                                else:
-                                    if self.dlg.tileSizeRadio.isChecked():
-                                        #snap tilesize up to resolution
-                                        xsplice = math.ceil(float(tilesizeX)/xres) * xres  
-                                        ysplice = math.ceil(float(tilesizeY)/xres) * yres
-                                        splicesX = int(math.ceil((xmax -xmin)/ float(xsplice)))
-                                        splicesY = int(math.ceil((ymax -ymin)/ float(ysplice)))
-                                #iterate
-                                for i in range(splicesX):
-                                    for j in range(splicesY):
-                                        xsplmin= xmin + i*xsplice
-                                        xsplmax= xmin + (i+1)*xsplice
-                                        ysplmin= ymin + j*ysplice
-                                        ysplmax = ymin + (j+1)*ysplice
-                                        #make a temporary Polygon
-                                        tmpf= "Polygon?crs="+ crs.authid()
-                                        gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
-                                        QgsMapLayerRegistry.instance().addMapLayer(gridtmp)
-                                        gridtmp.startEditing()
-                                        pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
-                                        fet = QgsFeature()
-                                        pr= gridtmp.dataProvider()
-                                        fet.setGeometry(QgsGeometry.fromWkt(pol))
-                                        pr.addFeatures( [ fet ] )
-                                        gridtmp.commitChanges()
-                                        #write it to tempfile. Needed, because gdalogr doesn't seem to accept memory layer?
-                                        writer = QgsVectorFileWriter.writeAsVectorFormat(gridtmp, tempfile,"utf-8",crs,"ESRI Shapefile")
-                                        folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
-                                        if not os.path.exists(folder):
-                                            os.makedirs(folder)
-                          
-                                        processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
-                                        
-                                        #add raster layer to canvas
-                                        if self.dlg.addTiles.isChecked()== True:
-                                            
-                                            fileInfo = QFileInfo(folder +pref + str(i)+"_"+str(j)+".tif")
-                                            baseName = fileInfo.baseName()
-                                            layer = QgsRasterLayer(folder +pref + str(i)+"_"+str(j)+".tif", baseName)
-                                            QgsMapLayerRegistry.instance().addMapLayer(layer)
-                          
-                                        #clean up
-                                        QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
-                                        if os.path.isfile(tempfile):
-                                            QgsVectorFileWriter.deleteShapeFile(tempfile)           
-                            #option cut by tile, vector layer
-                            else:
-                                if layertocut.type()== QgsMapLayer.VectorLayer:
-                                    #if tile number is given
-                                    if self.dlg.numberTilesRadio.isChecked():
-                                        xsplice = (xmax - xmin)/splicesX
-                                        ysplice = (ymax - ymin)/splicesY
-                                    else:
-                                        #if tile size is given
-                                        if self.dlg.tileSizeRadio.isChecked():
-                                            xsplice = tilesizeX
-                                            ysplice = tilesizeY
-                                            splicesX = int(math.ceil((xmax-xmin)/float(tilesizeX)))
-                                            splicesY = int(math.ceil((ymax-ymin)/float(tilesizeY)))
-                                    #iterate
-                                    for i in range(splicesX):
-                                            for j in range(splicesY):
-                                                xsplmin= xmin + i*xsplice
-                                                xsplmax= xmin + (i+1)*xsplice
-                                                ysplmin= ymin + j*ysplice
-                                                ysplmax = ymin + (j+1)*ysplice
-                                                #make a temporary polygon
-                                                tmpf= "Polygon?crs="+ crs.authid()
-                                                gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
-                                                QgsMapLayerRegistry.instance().addMapLayer(gridtmp)
-                                                gridtmp.startEditing()
-                                                pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
-                                                fet = QgsFeature()
-                                                pr= gridtmp.dataProvider()
-                                                fet.setGeometry(QgsGeometry.fromWkt(pol))
-                                                pr.addFeatures( [ fet ] )
-                                                gridtmp.commitChanges()
-                                                #write it to tempfile
-                                                writer = QgsVectorFileWriter.writeAsVectorFormat(gridtmp, tempfile,"utf-8",crs,"ESRI Shapefile")
-                                                folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
-                                                if not os.path.exists(folder):
-                                                    os.makedirs(folder)
-                    
-                                                processing.runalg('qgis:intersection', layertocut, gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
-                                                
-                                                #add to canvas
-                                                if self.dlg.addTiles.isChecked()== True:
-                                                    layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
-                                                    QgsMapLayerRegistry.instance().addMapLayer(layer)
-                                                #clean up
-                                                QgsMapLayerRegistry.instance().removeMapLayers( [gridtmp.id()] )
-                                                if os.path.isfile(tempfile):
-                                                    QgsVectorFileWriter.deleteShapeFile(tempfile)    
-                                                    
-                                else:
-                                    QMessageBox.information(None, "Grid Splitter", "Unknown file format. Only Raster and Vector are supported")
+                                return "0" 
+                        else: 
+                            return "1"
                 else:
-                  QMessageBox.information(None, "Grid Splitter", "Please specify temporary file")
-                  pass
-              else:
-                QMessageBox.information(None, "Grid Splitter", "Please specify output directory")
-              
+                    QMessageBox.information(None, "Grid Splitter", "Please specify temporary file")
+                    return "0"
             else:
-                QMessageBox.information(None, "Grid Splitter", "Please specify raster")
-            
+                QMessageBox.information(None, "Grid Splitter", "Please specify output directory")
+                return "0"
         else:
-            chekk="1" #end GUI loop if anything other than "okay" returns
+            QMessageBox.information(None, "Grid Splitter", "Please specify layer")
+            return "0"
+
+
+    def run(self):
+     # show the dialog
+     #loop the GUI until each required parameter is checked
+     chekk="0"
+     while chekk != "1": 
+        self.dlg.show() # Run the dialog event loop
+        result = self.dlg.exec_()
+        #if okay pressed, check for parameters
+        if result: #if okay is pressed
+            chekk = self.checkempties() #check parameters
+            if chekk=="1":
+                self.operate()
+        else:
+            chekk = "1" #end check loop and stop running
+        
+    
+    def operate(self):
+        
+        #get variables
+        
+        outputfolder = self.dlg.OuptDir.text()
+        splicesX = int(self.dlg.splicesXSpinBox.text())
+        splicesY = int(self.dlg.splicesYSpinBox.text())
+        tilesizeX= float(self.dlg.tileSizeX.value())
+        tilesizeY= float(self.dlg.tileSizeY.value())
+        layertocut = self.dlg.inputRasterBox.currentLayer()
+        self.tempfile = self.dlg.tempFile.text()
+        pref = self.dlg.prefixx.text()
+        self.crs= layertocut.crs()   
+        ext = layertocut.extent()
+        cutlayer = self.dlg.cutLayerBox.currentLayer()
+        
+        if self.dlg.cutLayerRadio.isChecked(): #option: cut by Cutlayer
+            if not os.path.exists(outputfolder):
+                os.makedirs(outputfolder)
+            iter = cutlayer.getFeatures()
+            
+            #do iterations over every feature
+            for feature in iter:
+                i= feature.id()
+                if feature.geometry().intersects(ext):
+                    self.poly = feature
+                    self.temppolygon() #make temporary file
+                    folder= outputfolder + os.sep + str(i)+ os.sep
+                    if not os.path.exists(folder):
+                        os.makedirs(folder) #make output folder
+                    #run for raster layer
+                    if layertocut.type()== QgsMapLayer.RasterLayer:
+                        processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "",folder +pref + str(i)+ ".tif")
+                            
+                        if self.dlg.addTiles.isChecked()== True:  
+                            #add raster layer to canvas
+                            fileInfo = QFileInfo(folder +pref + str(i)+".tif")
+                            baseName = fileInfo.baseName()
+                            layer = QgsRasterLayer(folder +pref + str(i)+".tif", baseName)
+                            QgsMapLayerRegistry.instance().addMapLayer(layer)
+                    
+                    #run for vector layer
+                    else:
+                        if layertocut.type()== QgsMapLayer.VectorLayer:
+                        
+                            processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
+                                
+                            if self.dlg.addTiles.isChecked()== True:
+                                layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
+                                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                    
+                    self.cleanup()#clean up tempfile
+                    
+        else: #option:cut by tile
+            if not os.path.exists(outputfolder):
+                os.makedirs(outputfolder) #make output base directory
+            xmax = layertocut.extent().xMaximum()
+            xmin = layertocut.extent().xMinimum()
+            ymax = layertocut.extent().yMaximum()
+            ymin = layertocut.extent().yMinimum()
+            if layertocut.type()== QgsMapLayer.RasterLayer: #option cutbytile, raster layer
+                 #if raster layer, get extents and calculate so it doesn't cut pixels. 
+                 #Make the tiles up to one pixel larger if they cut
+                rwidth = layertocut.width()
+                rheight = layertocut.height()
+                xres = (xmax-xmin)/rwidth
+                yres = (ymax-ymin)/rheight
+                #if tile number is given
+                if self.dlg.numberTilesRadio.isChecked():
+                    ixx= float(rwidth)/splicesX
+                    iyy= float(rheight)/splicesY
+                    xsplice = math.ceil(ixx) * xres
+                    ysplice = math.ceil(iyy) * yres
+                else:
+                    #if tile size is given
+                    if self.dlg.tileSizeRadio.isChecked():
+                        #snap tilesize up to resolution
+                        xsplice = math.ceil(float(tilesizeX)/xres) * xres  
+                        ysplice = math.ceil(float(tilesizeY)/yres) * yres
+                        splicesX = int(math.ceil((xmax -xmin)/ float(xsplice)))
+                        splicesY = int(math.ceil((ymax -ymin)/ float(ysplice)))
+                        
+                #iterate
+                for i in range(splicesX):
+                    for j in range(splicesY):
+                        
+                        #make a temporary Polygon
+                        xsplmin= xmin + i*xsplice
+                        xsplmax= xmin + (i+1)*xsplice
+                        ysplmin= ymin + j*ysplice
+                        ysplmax = ymin + (j+1)*ysplice
+                        pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
+                        self.poly = QgsFeature()
+                        self.poly.setGeometry(QgsGeometry.fromWkt(pol))
+                        self.temppolygon()
+                        
+                        folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep 
+                        if not os.path.exists(folder): #create folders
+                            os.makedirs(folder)
+                        processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                        
+                        #add raster layer to canvas
+                        if self.dlg.addTiles.isChecked()== True:
+                            fileInfo = QFileInfo(folder +pref + str(i)+"_"+str(j)+".tif")
+                            baseName = fileInfo.baseName()
+                            layer = QgsRasterLayer(folder +pref + str(i)+"_"+str(j)+".tif", baseName)
+                            QgsMapLayerRegistry.instance().addMapLayer(layer)
+                            
+                        #clean up
+                        self.cleanup()
+                        
+            else: #option cut by tile, vector layer
+                if layertocut.type()== QgsMapLayer.VectorLayer:
+                    
+                    if self.dlg.numberTilesRadio.isChecked():#if tile number is given
+                        xsplice = (xmax - xmin)/splicesX
+                        ysplice = (ymax - ymin)/splicesY
+                    else: #if tile size is given
+                        
+                        if self.dlg.tileSizeRadio.isChecked():
+                            xsplice = tilesizeX
+                            ysplice = tilesizeY
+                            splicesX = int(math.ceil((xmax-xmin)/float(tilesizeX)))
+                            splicesY = int(math.ceil((ymax-ymin)/float(tilesizeY)))
+                    #iterate
+                    for i in range(splicesX):
+                        for j in range(splicesY):
+                            #make a temporary polygon
+                            xsplmin= xmin + i*xsplice
+                            xsplmax= xmin + (i+1)*xsplice
+                            ysplmin= ymin + j*ysplice
+                            ysplmax = ymin + (j+1)*ysplice
+                            pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
+                            self.poly = QgsFeature()
+                            self.poly.setGeometry(QgsGeometry.fromWkt(pol))
+                            self.temppolygon()
+                            
+                            folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
+                            if not os.path.exists(folder):
+                                os.makedirs(folder) #make folders
+                                
+                            processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                            
+                            #add to canvas
+                            if self.dlg.addTiles.isChecked()== True:
+                                layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
+                                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                            
+                            #clean up
+                            self.cleanup()
+    
+    def cleanup(self):
+        QgsMapLayerRegistry.instance().removeMapLayers( [self.gridtmp.id()] )
+        if os.path.isfile(self.tempfile):
+            QgsVectorFileWriter.deleteShapeFile(self.tempfile)
+            
+    def temppolygon(operate):
+        tmpf= "Polygon?crs="+ operate.crs.authid()
+        operate.gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
+        QgsMapLayerRegistry.instance().addMapLayer(operate.gridtmp)
+        operate.gridtmp.startEditing()
+        fet = QgsFeature()
+        pr= operate.gridtmp.dataProvider()
+        fet.setGeometry(operate.poly.geometry())
+        pr.addFeatures( [ fet ] )
+        operate.gridtmp.commitChanges()
+        #write it to tempfile
+        QgsVectorFileWriter.writeAsVectorFormat(operate.gridtmp, operate.tempfile,"utf-8",operate.crs,"ESRI Shapefile")
+        
