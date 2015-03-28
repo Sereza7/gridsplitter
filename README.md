@@ -22,6 +22,12 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
-V 0.3: Added option to cut by map units, and to cut by cutlayer features
+v 0.3.1 typo in "raster by tile size" fixed
+
+  typos which affected polygon cutting and naming
+
+  general rewrite for readability
+
+v 0.3: Added option to cut by map units, and to cut by cutlayer features
 
 v 0.2: Map tiles can be added to canvas after running
