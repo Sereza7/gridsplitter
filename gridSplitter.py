@@ -73,7 +73,7 @@ class gridSplitter:
         callback,
         enabled_flag=True,
         add_to_menu=True,
-        add_to_toolbar=True,
+        add_to_toolbar=False,
         status_tip=None,
         whats_this=None,
         parent=None):
@@ -188,6 +188,7 @@ class gridSplitter:
         self.tempfile = self.dlg.tempFile.text()
         pref = self.dlg.prefixx.text()
         self.crs= layertocut.crs()   
+        #todo: if crs != EPSG code, ask which one to use
         ext = layertocut.extent()
         cutlayer = self.dlg.cutLayerBox.currentLayer()
         
@@ -331,16 +332,21 @@ class gridSplitter:
         if os.path.isfile(self.tempfile):
             QgsVectorFileWriter.deleteShapeFile(self.tempfile)
             
-    def temppolygon(operate):
-        tmpf= "Polygon?crs="+ operate.crs.authid()
-        operate.gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
-        QgsMapLayerRegistry.instance().addMapLayer(operate.gridtmp)
-        operate.gridtmp.startEditing()
+    def temppolygon(self):
+	#stop the annoying asks with user-defined CRS
+	if self.crs.authid().startswith('USER'):
+	  epsg = self.crs.toWkt()
+	else:
+	  epsg= self.crs.authid() 
+        tmpf= "Polygon?crs="+ epsg #what happens if there's no EPSG?
+        self.gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
+        QgsMapLayerRegistry.instance().addMapLayer(self.gridtmp)
+        self.gridtmp.startEditing()
         fet = QgsFeature()
-        pr= operate.gridtmp.dataProvider()
-        fet.setGeometry(operate.poly.geometry())
+        pr= self.gridtmp.dataProvider()
+        fet.setGeometry(self.poly.geometry())
         pr.addFeatures( [ fet ] )
-        operate.gridtmp.commitChanges()
+        self.gridtmp.commitChanges()
         #write it to tempfile
-        QgsVectorFileWriter.writeAsVectorFormat(operate.gridtmp, operate.tempfile,"utf-8",operate.crs,"ESRI Shapefile")
+        QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.tempfile,"utf-8",self.crs,"ESRI Shapefile")
         
