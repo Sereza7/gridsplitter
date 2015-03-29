@@ -19,7 +19,7 @@ It checks for gaps and makes the tiles a tiny bit (up to one pixel input resolut
 So, if size given is a multiplier of "5m" and a pixel resolution of 5.1 m is given, the tile will be a multiplier of 5.1m.
 
 The third option (v.0.3) takes a cut layer and cuts a piece for ecery feature in the cut layer. This option does not 
-check for gaps and overlaps.
+check for overlaps.
 
 It aims to be functional in any coordinate reference system. It also takes User-defined CRS (v.0.3.2).
 

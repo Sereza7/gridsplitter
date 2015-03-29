@@ -211,7 +211,7 @@ class gridSplitter:
                             os.makedirs(folder) #make output folder
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "-cblend 1",folder +pref + str(i)+ ".tif")
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "-cblend 0.5",folder +pref + str(i)+ ".tif")
                             
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas

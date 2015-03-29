@@ -26,6 +26,8 @@ v.0.3.2  added warning for operations pending
 	
 	added handling of user-defined CRS
 
+	cut raster by cutlayer: no more gaps
+
 v 0.3.1 typo in "raster by tile size" fixed
 
 	typos which affected polygon cutting and naming
