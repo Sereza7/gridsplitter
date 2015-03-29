@@ -60,6 +60,9 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="8" column="0">
        <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
         </property>
@@ -80,6 +83,9 @@
       </item>
       <item row="11" column="0">
        <widget class="QLabel" name="label_7">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A temporary shapefile that holds the &amp;quot;cut polygon&amp;quot;. It is needed because GDAL does not accept in-memory layers. The size will be quite small, except when using the option &amp;quot;cutlayer&amp;quot; with very complicated features.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
         </property>
@@ -109,10 +115,17 @@
        </widget>
       </item>
       <item row="8" column="2">
-       <widget class="QLineEdit" name="OuptDir"/>
+       <widget class="QLineEdit" name="OuptDir">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
       </item>
       <item row="11" column="2">
        <widget class="QLineEdit" name="tempFile">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A temporary shapefile that holds the &amp;quot;cut polygon&amp;quot;. It is needed because GDAL does not accept in-memory layers. The size will be quite small, except when using the option &amp;quot;cutlayer&amp;quot; with very complicated features.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>/tmp/tempshape.shp</string>
         </property>
@@ -120,6 +133,9 @@
       </item>
       <item row="0" column="2">
        <widget class="QgsMapLayerComboBox" name="inputRasterBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The layer you want to cut. It will not be modified.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="frame">
          <bool>true</bool>
         </property>
@@ -139,10 +155,17 @@
        </widget>
       </item>
       <item row="9" column="2">
-       <widget class="QLineEdit" name="prefixx"/>
+       <widget class="QLineEdit" name="prefixx">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
       </item>
       <item row="9" column="0">
        <widget class="QLabel" name="label_8">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>prefix for output files:</string>
         </property>
@@ -150,6 +173,9 @@
       </item>
       <item row="10" column="0">
        <widget class="QCheckBox" name="addTiles">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the created files to QGIS. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Add tiles to canvas</string>
         </property>
@@ -164,6 +190,9 @@
       </item>
       <item row="3" column="4">
        <widget class="QgsSpinBox" name="splicesXSpinBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -184,6 +213,9 @@
       </item>
       <item row="6" column="4">
        <widget class="QgsDoubleSpinBox" name="tileSizeY">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="minimum">
          <double>0.000000000000000</double>
         </property>
@@ -197,6 +229,9 @@
       </item>
       <item row="4" column="4">
        <widget class="QgsSpinBox" name="splicesYSpinBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -220,6 +255,9 @@
       </item>
       <item row="7" column="2">
        <widget class="QgsMapLayerComboBox" name="cutLayerBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="filters">
          <set>QgsMapLayerProxyModel::PolygonLayer</set>
         </property>
@@ -227,6 +265,9 @@
       </item>
       <item row="5" column="4">
        <widget class="QgsDoubleSpinBox" name="tileSizeX">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="minimum">
          <double>0.000000000000000</double>
         </property>
@@ -240,6 +281,9 @@
       </item>
       <item row="3" column="1">
        <widget class="QRadioButton" name="numberTilesRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the number of tiles you want.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>number of tiles</string>
         </property>
@@ -250,6 +294,9 @@
       </item>
       <item row="5" column="1">
        <widget class="QRadioButton" name="tileSizeRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify the size of the tiles. If the resolution does not allow this size, it will be up to one resolution pixel bigger&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>tile size 
 (in input map units)</string>
@@ -258,6 +305,9 @@
       </item>
       <item row="7" column="1">
        <widget class="QRadioButton" name="cutLayerRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>cut layer</string>
         </property>
@@ -309,7 +359,7 @@
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>gridSplitter cuts your input layer into tilesX * tilesY pieces.
+         <string>gridSplitter cuts your input layer into pieces.
 If it is a raster, it tries to keep the raster's resolution to avoid gaps and overlaps.
 If the number of splices and the resolution don't match up, it cuts slightly larger tiles, resulting in the last tile having a bit of &quot;no Data&quot;.
 The output is stored in subdirectories in TIF file format.
