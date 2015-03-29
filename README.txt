@@ -6,15 +6,31 @@ Concept
 =================
 
 The gridSplitter is written to cleanly cut input features. It is a wrapper for gdalogr/cliprasterbymasklayer
-and qgis:intersection. It takes the extent of the input data, divides it by a number of pieces and saves 
-those pieces to an output directory and subdirectories. It aims to be functional in any coordinate reference 
-system and with any number of pieces (or tiles). It saves its outputs in .TIF and .shp, respectively.
+and qgis:intersection. 
+It has several options:
+
+The first option, cut by tile number (v.0.1), takes the extent of the input data, divides it by a number of 
+pieces and saves those pieces to an output directory and subdirectories. 
+It checks for gaps and makes the tiles a tiny bit (up to one pixel inpput resolution) bigger if needed.
+
+The second option, (v.0.3) cut by tile size, takes as user input the tile size in input map units and determines the 
+number of tiles needed, saving those into subdirectories.
+It checks for gaps and makes the tiles a tiny bit (up to one pixel input resolution) bigger 
+So, if size given is a multiplier of "5m" and a pixel resolution of 5.1 m is given, the tile will be a multiplier of 5.1m.
+
+The third option (v.0.3) takes a cut layer and cuts a piece for ecery feature in the cut layer. This option does not 
+check for gaps and overlaps.
+
+It aims to be functional in any coordinate reference system. It also takes User-defined CRS (v.0.3.2).
+
+It saves its outputs in .TIF and .shp, respectively.
 
 Running the plugin
 =================
-The plugin needs a layer to be loaded in QGIS to process it. The output layers won't be added to the canvas, 
-as this is not useful when making lots of pieces.
+The plugin needs a layer to be loaded in QGIS to process it. It then loops until all input parameters are set, 
+and then warns the user of the amount of cutting upcoming (v.0.3,2). 
 
+If desired, the newly created tiles will be added to QGIS, if not, they'll just be stored on hard disk.
 
 Required Parameters
 ...................
