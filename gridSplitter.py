@@ -197,8 +197,10 @@ class gridSplitter:
             self.amount=cutlayer.featureCount()
             goon= self.warn()
             if goon == True:
-                iter = cutlayer.getFeatures()
+                iter = cutlayer.getFeatures() 
+                #TODO warning if first file exists
                 #do iterations over every feature
+               
                 for feature in iter:
                     i= feature.id()
                     if feature.geometry().intersects(ext):
@@ -209,7 +211,7 @@ class gridSplitter:
                             os.makedirs(folder) #make output folder
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "",folder +pref + str(i)+ ".tif")
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "-cblend 1",folder +pref + str(i)+ ".tif")
                             
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
@@ -260,7 +262,8 @@ class gridSplitter:
                         splicesY = int(math.ceil((ymax -ymin)/ float(ysplice)))
                 self.amount = splicesX * splicesY    
                 goon = self.warn()    
-                if goon == True:    
+                if goon == True:  
+		    #TODO warning if first file exists
                     #iterate
                     for i in range(splicesX):
                         for j in range(splicesY):
@@ -309,6 +312,7 @@ class gridSplitter:
                     self.amount = splicesX*splicesY
                     goon = self.warn()
                     if goon==True:
+		        #TODO warning if first file exists
                         #iterate
                         for i in range(splicesX):
                             for j in range(splicesY):
