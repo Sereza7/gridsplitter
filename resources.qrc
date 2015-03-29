@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/gridSplitter" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>
