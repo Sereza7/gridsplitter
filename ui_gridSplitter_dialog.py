@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gridSplitter_dialog_base.ui'
 #
-# Created: Fri Mar 27 18:55:24 2015
+# Created: Sun Mar 29 17:52:55 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,7 +39,7 @@ class Ui_gridSplicerDialogBase(object):
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
         self.layoutWidget = QtGui.QWidget(self.tab)
-        self.layoutWidget.setGeometry(QtCore.QRect(6, 20, 551, 391))
+        self.layoutWidget.setGeometry(QtCore.QRect(6, 20, 556, 391))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.gridLayout = QtGui.QGridLayout(self.layoutWidget)
         self.gridLayout.setMargin(0)
@@ -222,11 +222,12 @@ class Ui_gridSplicerDialogBase(object):
         self.label_14.setText(_translate("gridSplicerDialogBase", "tile size (X axis)", None))
         self.label_5.setText(_translate("gridSplicerDialogBase", "number of tiles (Y axis)", None))
         self.numberTilesRadio.setText(_translate("gridSplicerDialogBase", "number of tiles", None))
-        self.tileSizeRadio.setText(_translate("gridSplicerDialogBase", "tile size", None))
+        self.tileSizeRadio.setText(_translate("gridSplicerDialogBase", "tile size \n"
+"(in input map units)", None))
         self.cutLayerRadio.setText(_translate("gridSplicerDialogBase", "cut layer", None))
         self.label_18.setText(_translate("gridSplicerDialogBase", "Method:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("gridSplicerDialogBase", "Parameters", None))
-        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.3. Please report errors to http://hub.qgis.org/projects/gridsplitter", None))
+        self.label_2.setText(_translate("gridSplicerDialogBase", "Version 0.3.2  Please report errors to http://hub.qgis.org/projects/gridsplitter", None))
         self.label.setText(_translate("gridSplicerDialogBase", "gridSplitter cuts your input layer into tilesX * tilesY pieces.\n"
 "If it is a raster, it tries to keep the raster\'s resolution to avoid gaps and overlaps.\n"
 "If the number of splices and the resolution don\'t match up, it cuts slightly larger tiles, resulting in the last tile having a bit of \"no Data\".\n"
@@ -234,9 +235,9 @@ class Ui_gridSplicerDialogBase(object):
 "Vector layers will be stored in shapefile format.", None))
         self.label_9.setText(_translate("gridSplicerDialogBase", "Input Layer: The Layer you want to process\n"
 "", None))
-        self.label_10.setText(_translate("gridSplicerDialogBase", "Number of tiles: Specify number of equal tiles you want to create", None))
-        self.label_16.setText(_translate("gridSplicerDialogBase", "Tile size: Specify how big the individual tiles will be in map units. They will be snapped to raster resolution", None))
-        self.label_17.setText(_translate("gridSplicerDialogBase", "Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature.", None))
+        self.label_10.setText(_translate("gridSplicerDialogBase", "Number of tiles: Specify number of tiles you want to create", None))
+        self.label_16.setText(_translate("gridSplicerDialogBase", "Tile size: Specify how big the individual tiles will be in map units. They will be snapped to raster resolution if raster resolution isn\'t a multiplier of this size", None))
+        self.label_17.setText(_translate("gridSplicerDialogBase", "Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature. Slight overlapping may occur.", None))
         self.label_11.setText(_translate("gridSplicerDialogBase", "Output Base Directory: Where you want your output to be stored. gridSplitter will make subdirectories for each tile", None))
         self.label_12.setText(_translate("gridSplicerDialogBase", "Prefix for output files (optional): To give the ouput files a better name than [tileX]_[tiley]", None))
         self.label_13.setText(_translate("gridSplicerDialogBase", "Temporary file: a non-existing file to store temporary informations, as some algorithm doesn\'t seem to accept memory layers", None))

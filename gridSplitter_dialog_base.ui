@@ -53,7 +53,7 @@
       <rect>
        <x>6</x>
        <y>20</y>
-       <width>551</width>
+       <width>556</width>
        <height>391</height>
       </rect>
      </property>
@@ -251,7 +251,8 @@
       <item row="5" column="1">
        <widget class="QRadioButton" name="tileSizeRadio">
         <property name="text">
-         <string>tile size</string>
+         <string>tile size 
+(in input map units)</string>
         </property>
        </widget>
       </item>
@@ -289,7 +290,7 @@
       <locale language="English" country="UnitedStates"/>
      </property>
      <property name="text">
-      <string>Version 0.3. Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
+      <string>Version 0.3.2  Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -330,7 +331,7 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Number of tiles: Specify number of equal tiles you want to create</string>
+         <string>Number of tiles: Specify number of tiles you want to create</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -340,7 +341,7 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_16">
         <property name="text">
-         <string>Tile size: Specify how big the individual tiles will be in map units. They will be snapped to raster resolution</string>
+         <string>Tile size: Specify how big the individual tiles will be in map units. They will be snapped to raster resolution if raster resolution isn't a multiplier of this size</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -350,7 +351,7 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_17">
         <property name="text">
-         <string>Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature.</string>
+         <string>Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature. Slight overlapping may occur.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
