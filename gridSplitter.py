@@ -197,10 +197,24 @@ class gridSplitter:
             self.amount=cutlayer.featureCount()
             goon= self.warn()
             if goon == True:
-                iter = cutlayer.getFeatures() 
+                
+                if self.crs != cutlayer.crs():
+                    #reproject cutlayer into temporary memory layer
+                    message= "The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?"
+                    k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.No)
+                    if k == QMessageBox.Yes:
+                        if self.crs.authid().startswith('USER'): #user-defined CRS
+                            epsg = self.crs.toWkt()
+                        else:				#EPSG - defined
+                            epsg= self.crs.authid()
+                        #reproject
+                        new= processing.runalg('qgis:reprojectlayer', cutlayer, epsg, None)
+                        cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
+                        QgsMapLayerRegistry.instance().addMapLayer(cutlayer)
+                        
                 #TODO warning if first file exists
                 #do iterations over every feature
-               
+                iter = cutlayer.getFeatures() 
                 for feature in iter:
                     i= feature.id()
                     if feature.geometry().intersects(ext):
@@ -263,7 +277,7 @@ class gridSplitter:
                 self.amount = splicesX * splicesY    
                 goon = self.warn()    
                 if goon == True:  
-		    #TODO warning if first file exists
+                    #TODO warning if first file exists
                     #iterate
                     for i in range(splicesX):
                         for j in range(splicesY):
@@ -312,7 +326,7 @@ class gridSplitter:
                     self.amount = splicesX*splicesY
                     goon = self.warn()
                     if goon==True:
-		        #TODO warning if first file exists
+                        #TODO warning if first file exists
                         #iterate
                         for i in range(splicesX):
                             for j in range(splicesY):
@@ -346,6 +360,10 @@ class gridSplitter:
         QgsMapLayerRegistry.instance().removeMapLayers( [self.gridtmp.id()] )
         if os.path.isfile(self.tempfile):
             QgsVectorFileWriter.deleteShapeFile(self.tempfile)
+        #there is a "code page" file remaining
+        cpg = self.tempfile[:-4]+ ".cpg"
+        if os.path.isfile(cpg):
+            os.remove(cpg)
             
     def temppolygon(self):
         #stop the annoying asks with user-defined CRS
