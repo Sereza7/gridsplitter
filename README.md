@@ -22,7 +22,9 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
-v.0.3.2 
+v.0.3.2 minor changes
+    moved "tempfile" to automatic handling
+	
     added reprojection of cutlayer if desired
     
     added warning for operations pending
@@ -31,15 +33,15 @@ v.0.3.2
     
     cut raster by cutlayer: no more gaps
 
-v 0.3.1 
+v 0.3.1 bugfix for 0.3.0
     typo in "raster by tile size" fixed
 
     typos which affected polygon cutting and naming
 
     general rewrite for readability
 
-v 0.3: 
+v 0.3: new features
     Added option to cut by map units, and to cut by cutlayer features
 
-v 0.2: 
+v 0.2: new feature
     Map tiles can be added to canvas after running

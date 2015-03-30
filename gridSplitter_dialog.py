@@ -35,19 +35,13 @@ class gridSplitterDialog(QtGui.QDialog, FORM_CLASS):
         self.button_box.accepted.connect(self.run)
         self.button_box.rejected.connect(self.close)
         self.cmdBrowseOutput.clicked.connect(self.output_path)
-        self.cmdBrowsetmp.clicked.connect(self.tmp_shp_path)
      
     def output_path(self):
        self.dirname = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
        self.OuptDir.clear()
        self.OuptDir.setText(self.dirname)
        
-    def tmp_shp_path(self):
-       self.shapename = str(QtGui.QFileDialog.getSaveFileName(None,"Create Shapefile", '', '*.shp'))
-       self.tempFile.clear()
-       self.tempFile.setText(self.shapename)
-    
-    def run(self):
+     def run(self):
       pass
       return
     

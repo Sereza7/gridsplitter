@@ -31,6 +31,7 @@ from qgis.core import *
 import processing
 import os
 import math
+import tempfile #for temp shapefile naming
 
 class gridSplitter:
     """QGIS Plugin Implementation."""
@@ -127,30 +128,17 @@ class gridSplitter:
         #check if some inputs aren't valid
         outputfolder = self.dlg.OuptDir.text()
         layertocut = self.dlg.inputRasterBox.currentLayer()
-        tempfile = self.dlg.tempFile.text()
         if layertocut!= "":
             if outputfolder!="":
-                if tempfile !="":
-                    if tempfile.upper().endswith(".SHP"):
-                        pass
-                    else: 
-                        tempfile= tempfile + ".shp"
-                    if os.path.isfile(tempfile) == True:
-                        QMessageBox.information(None,"Shapefile exists!", "Please specify a shapefile that doesn't exist. The shapefile will be overwritten and deleted")
-                        return "0"
-                    else: 
-                        if self.dlg.cutLayerRadio.isChecked(): #check for "cutlayer if this is the option
-                            cutlayer = self.dlg.cutLayerBox.currentLayer()
-                            if cutlayer != "": #check if cutlayer exists
-                                return "1"
-                            else: #if cutlayer does not exist
-                                QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
-                                return "0" 
-                        else: 
-                            return "1"
-                else:
-                    QMessageBox.information(None, "Grid Splitter", "Please specify temporary file")
-                    return "0"
+                if self.dlg.cutLayerRadio.isChecked(): #check for "cutlayer if this is the option
+                    cutlayer = self.dlg.cutLayerBox.currentLayer()
+                    if cutlayer != "": #check if cutlayer exists
+                        return "1"
+                    else: #if cutlayer does not exist
+                        QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
+                        return "0" 
+                else: 
+                    return "1"
             else:
                 QMessageBox.information(None, "Grid Splitter", "Please specify output directory")
                 return "0"
@@ -185,7 +173,10 @@ class gridSplitter:
         tilesizeX= float(self.dlg.tileSizeX.value())
         tilesizeY= float(self.dlg.tileSizeY.value())
         layertocut = self.dlg.inputRasterBox.currentLayer()
-        self.tempfile = self.dlg.tempFile.text()
+        #self.temp = self.dlg.tempFile.text()
+        #create temporary file name. I just want a non-existing name
+        tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSpliiter_tmpfile_')
+        self.temp = tmp[1]
         pref = self.dlg.prefixx.text()
         self.crs= layertocut.crs()   
         ext = layertocut.extent()
@@ -225,7 +216,7 @@ class gridSplitter:
                             os.makedirs(folder) #make output folder
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile, None, False, False, "-cblend 0.5",folder +pref + str(i)+ ".tif")
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5",folder +pref + str(i)+ ".tif")
                             
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
@@ -295,7 +286,7 @@ class gridSplitter:
                             folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep 
                             if not os.path.exists(folder): #create folders
                                 os.makedirs(folder)
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.tempfile , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
                             
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
@@ -358,10 +349,10 @@ class gridSplitter:
                         
     def cleanup(self):
         QgsMapLayerRegistry.instance().removeMapLayers( [self.gridtmp.id()] )
-        if os.path.isfile(self.tempfile):
-            QgsVectorFileWriter.deleteShapeFile(self.tempfile)
+        if os.path.isfile(self.temp):
+            QgsVectorFileWriter.deleteShapeFile(self.temp)
         #there is a "code page" file remaining
-        cpg = self.tempfile[:-4]+ ".cpg"
+        cpg = self.temp[:-4]+ ".cpg"
         if os.path.isfile(cpg):
             os.remove(cpg)
             
@@ -381,7 +372,7 @@ class gridSplitter:
         pr.addFeatures( [ fet ] )
         self.gridtmp.commitChanges()
         #write it to tempfile
-        QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.tempfile,"utf-8",self.crs,"ESRI Shapefile")
+        QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.crs,"ESRI Shapefile")
         
     def warn(self):
         message= "you are about to make " + str(self.amount) + " tiles. Continue?"

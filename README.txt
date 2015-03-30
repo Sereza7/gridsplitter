@@ -39,9 +39,6 @@ Required Parameters
 :Output Dir: Base Directory where the output will be stored. Subdirectories will be created which indicate
 the tiles.
 
-:temporary file: Since the algorithm can't process an in-memory layer, a temporary shapefile will be created 
-and deleted at the end, used for iterations.
-
 :Method: One of the methods has to be selected (See below).
 
 
