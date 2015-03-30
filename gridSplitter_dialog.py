@@ -41,9 +41,9 @@ class gridSplitterDialog(QtGui.QDialog, FORM_CLASS):
        self.OuptDir.clear()
        self.OuptDir.setText(self.dirname)
        
-     def run(self):
-      pass
-      return
+    def run(self):
+        pass
+        return
     
     def close(self):
-      pass
+        pass
