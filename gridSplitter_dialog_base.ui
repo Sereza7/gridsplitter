@@ -401,7 +401,8 @@ Vector layers will be stored in shapefile format.</string>
       <item>
        <widget class="QLabel" name="label_17">
         <property name="text">
-         <string>Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature. Slight overlapping may occur.</string>
+         <string>Cut Layer: A polygon layer containing input features. There will be a tile cut for each input feature. Slight overlapping may occur.
+If the cut layer is in a different projection than the input file, there will be an option to reproject.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

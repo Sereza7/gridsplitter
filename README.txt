@@ -66,4 +66,5 @@ Enter size in map units for both axis and it will calculate the number of tiles 
 
 Cutting by Layer:
 
-A tile for every feature will be created.
+A tile for every feature will be created. If the CutLayer is in a non-matching projection, a reprojection will be attempted. 
+(original file won't be modified)

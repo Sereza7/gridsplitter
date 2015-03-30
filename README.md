@@ -22,18 +22,24 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
-v.0.3.2  added warning for operations pending
-	
-	added handling of user-defined CRS
+v.0.3.2 
+    added reprojection of cutlayer if desired
+    
+    added warning for operations pending
+    
+    added handling of user-defined CRS
+    
+    cut raster by cutlayer: no more gaps
 
-	cut raster by cutlayer: no more gaps
+v 0.3.1 
+    typo in "raster by tile size" fixed
 
-v 0.3.1 typo in "raster by tile size" fixed
+    typos which affected polygon cutting and naming
 
-	typos which affected polygon cutting and naming
+    general rewrite for readability
 
-	general rewrite for readability
+v 0.3: 
+    Added option to cut by map units, and to cut by cutlayer features
 
-v 0.3: Added option to cut by map units, and to cut by cutlayer features
-
-v 0.2: Map tiles can be added to canvas after running
+v 0.2: 
+    Map tiles can be added to canvas after running
