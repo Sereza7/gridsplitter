@@ -32,6 +32,8 @@ import processing
 import os
 import math
 import tempfile #for temp shapefile naming
+from subprocess import *
+
 
 class gridSplitter:
     """QGIS Plugin Implementation."""
@@ -130,9 +132,9 @@ class gridSplitter:
         layertocut = self.dlg.inputRasterBox.currentLayer()
         if layertocut!= "":
             if outputfolder!="":
-                if self.dlg.cutLayerRadio.isChecked(): #check for "cutlayer if this is the option
-                    cutlayer = self.dlg.cutLayerBox.currentLayer()
-                    if cutlayer != "": #check if cutlayer exists
+                if self.dlg.cutLayerRadio.isChecked(): #check for cutlayer if this is the option
+                    self.cutlayer = self.dlg.cutLayerBox.currentLayer()
+                    if self.cutlayer != "": #check if cutlayer exists
                         return "1"
                     else: #if cutlayer does not exist
                         QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
@@ -173,39 +175,27 @@ class gridSplitter:
         tilesizeX= float(self.dlg.tileSizeX.value())
         tilesizeY= float(self.dlg.tileSizeY.value())
         layertocut = self.dlg.inputRasterBox.currentLayer()
-        #self.temp = self.dlg.tempFile.text()
-        #create temporary file name. I just want a non-existing name
-        tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSpliiter_tmpfile_')
+        tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
         self.temp = tmp[1]
         pref = self.dlg.prefixx.text()
-        self.crs= layertocut.crs()   
+        self.layertocutcrs= layertocut.crs()   
         ext = layertocut.extent()
-        cutlayer = self.dlg.cutLayerBox.currentLayer()
+        l = layertocut.dataProvider().dataSourceUri()
+        layertocutFilePath= l.split('|')[0]
         
         if self.dlg.cutLayerRadio.isChecked(): #option: cut by Cutlayer
             if not os.path.exists(outputfolder):
                 os.makedirs(outputfolder)
-            self.amount=cutlayer.featureCount()
+            self.amount=self.cutlayer.featureCount()
             goon= self.warn()
             if goon == True:
-                
-                if self.crs != cutlayer.crs():
-                    #reproject cutlayer into temporary memory layer
-                    message= "The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?"
-                    k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.No)
-                    if k == QMessageBox.Yes:
-                        if self.crs.authid().startswith('USER'): #user-defined CRS
-                            epsg = self.crs.toWkt()
-                        else:				#EPSG - defined
-                            epsg= self.crs.authid()
-                        #reproject
-                        new= processing.runalg('qgis:reprojectlayer', cutlayer, epsg, None)
-                        cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
-                        QgsMapLayerRegistry.instance().addMapLayer(cutlayer)
-                        
+                if self.layertocutcrs != self.cutlayer.crs():
+                    self.reprojectTempFile()
+                else:
+                    self.epsg=self.layertocutcrs.toProj4()
                 #TODO warning if first file exists
                 #do iterations over every feature
-                iter = cutlayer.getFeatures() 
+                iter = self.cutlayer.getFeatures() 
                 for feature in iter:
                     i= feature.id()
                     if feature.geometry().intersects(ext):
@@ -216,7 +206,12 @@ class gridSplitter:
                             os.makedirs(folder) #make output folder
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5",folder +pref + str(i)+ ".tif")
+                            nodata = layertocut.dataProvider().srcNoDataValue(1) #what about multiband rasters?
+                            self.epsg=self.layertocutcrs.toProj4()
+                            
+                            #TODO calling gdalwarp directly? solves problem with "unprojected" jpg etc., but is OS dependent?
+                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,folder+pref+str(i)+".tif"])
+                            #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5 -s_srs " + self.layertocutcrs.authid() + "-t_srs " + self.layertocutcrs.authid(),folder +pref + str(i)+ ".tif")
                             
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
@@ -224,11 +219,14 @@ class gridSplitter:
                                 baseName = fileInfo.baseName()
                                 layer = QgsRasterLayer(folder +pref + str(i)+".tif", baseName)
                                 QgsMapLayerRegistry.instance().addMapLayer(layer)
-                        #run for vector layer
-                        else:
+                        
+                        else: #run for vector layer
                             if layertocut.type()== QgsMapLayer.VectorLayer:
-                            
-                                processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
+                                
+                                #TODO Experimental: Call ogr directly
+                                #	ogr2ogr  -clipsrc  testpolygon1.shp  output.shp            testpolygon2.shp
+                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, folder+ pref +str(i)+".shp", layertocutFilePath])
+                                #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
                                 
                                 if self.dlg.addTiles.isChecked()== True:
                                     layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
@@ -240,6 +238,7 @@ class gridSplitter:
         else: #option:cut by tile
             if not os.path.exists(outputfolder):
                 os.makedirs(outputfolder) #make output base directory
+            self.epsg=self.layertocutcrs.toProj4()
             xmax = float(layertocut.extent().xMaximum())
             xmin = float(layertocut.extent().xMinimum())
             ymax = float(layertocut.extent().yMaximum())
@@ -247,9 +246,9 @@ class gridSplitter:
             if layertocut.type()== QgsMapLayer.RasterLayer: #option cutbytile, raster layer
                  #if raster layer, get extents and calculate so it doesn't cut pixels. 
                  #Make the tiles up to one pixel larger if they cut
-                rwidth = layertocut.width()
-                rheight = layertocut.height()
-                xres = (xmax-xmin)/rwidth
+                rwidth = float(layertocut.width())
+                rheight = float(layertocut.height())
+                xres = (xmax-xmin)/rwidth #WMS layer fails here: ZeroDivisionError: float division by zero
                 yres = (ymax-ymin)/rheight
                 #if tile number is given
                 if self.dlg.numberTilesRadio.isChecked():
@@ -286,7 +285,10 @@ class gridSplitter:
                             folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep 
                             if not os.path.exists(folder): #create folders
                                 os.makedirs(folder)
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                            nodata = layertocut.dataProvider().srcNoDataValue(1) #what about multiband rasters?
+                            #TODO experimental
+                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,folder+pref+str(i)+"_"+str(j)+".tif"])
+                            #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
                             
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
@@ -307,7 +309,6 @@ class gridSplitter:
                         xsplice = (xmax - xmin)/splicesX
                         ysplice = (ymax - ymin)/splicesY
                     else: #if tile size is given
-                        
                         if self.dlg.tileSizeRadio.isChecked():
                             xsplice = tilesizeX
                             ysplice = tilesizeY
@@ -334,8 +335,9 @@ class gridSplitter:
                                 folder= outputfolder + os.sep + str(i)+os.sep + str(j)+ os.sep
                                 if not os.path.exists(folder):
                                     os.makedirs(folder) #make folders
-                                    
-                                processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                                #TODO Experimental: call ogr directly instead of qgis    
+                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, folder+ pref +str(i)+"_"+str(j)+".shp", layertocutFilePath])
+                                #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
                                 
                                 #add to canvas
                                 if self.dlg.addTiles.isChecked()== True:
@@ -358,11 +360,11 @@ class gridSplitter:
             
     def temppolygon(self):
         #stop the annoying asks with user-defined CRS
-        if self.crs.authid().startswith('USER'):
-            epsg = self.crs.toWkt()
+        if self.layertocutcrs.authid().startswith('USER'):
+            self.epsg = self.layertocutcrs.toWkt()
         else:
-            epsg= self.crs.authid() 
-        tmpf= "Polygon?crs="+ epsg #what happens if there's no EPSG?
+            self.epsg= self.layertocutcrs.authid() 
+        tmpf= "Polygon?crs="+ self.epsg
         self.gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
         QgsMapLayerRegistry.instance().addMapLayer(self.gridtmp)
         self.gridtmp.startEditing()
@@ -372,12 +374,40 @@ class gridSplitter:
         pr.addFeatures( [ fet ] )
         self.gridtmp.commitChanges()
         #write it to tempfile
-        QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.crs,"ESRI Shapefile")
+        QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.layertocutcrs,"ESRI Shapefile")
         
     def warn(self):
-        message= "you are about to make " + str(self.amount) + " tiles. Continue?"
+        message= "you are about to make up to " + str(self.amount) + " tiles. Continue?"
         k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.Abort)
         if k == QMessageBox.Yes:
             return True
         else:
             return False
+
+    def reprojectTempFile(self):
+        #reproject cutlayer into temporary memory layer
+        message= "The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?"
+        k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.No)
+        if k == QMessageBox.Yes:
+            if self.layertocutcrs.authid().startswith('USER'): #user-defined CRS
+                self.epsg = self.layertocutcrs.toWkt()
+            else: #EPSG - defined				
+	         self.epsg= self.layertocutcrs.authid()
+	    
+	    cutlayersrs= self.cutlayer.crs()
+            if cutlayersrs.authid().startswith('USER'): #user-defined CRS
+                srcsrs = cutlayersrs.toWkt()
+            else:				#EPSG - defined
+                srcsrs= cutlayersrs.authid()
+            #reproject TODO with ogr2ogr
+            tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')[1]
+            os.remove(tmp)
+            c = self.cutlayer.dataProvider().dataSourceUri()
+	    cutlayername= c.split('|')[0]
+            call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
+            self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
+            #new= processing.runalg('qgis:reprojectlayer', cutlayer, self.epsg, None)
+            #cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
+            QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
+        else: #don't reproject
+            pass
