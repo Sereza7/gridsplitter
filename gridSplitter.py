@@ -182,6 +182,7 @@ class gridSplitter:
         ext = layertocut.extent()
         l = layertocut.dataProvider().dataSourceUri()
         layertocutFilePath= l.split('|')[0]
+        existwarning=0
         
         if self.dlg.cutLayerRadio.isChecked(): #option: cut by Cutlayer
             if not os.path.exists(outputfolder):
@@ -193,7 +194,6 @@ class gridSplitter:
                     self.reprojectTempFile()
                 else:
                     self.epsg=self.layertocutcrs.toProj4()
-                #TODO warning if first file exists
                 #do iterations over every feature
                 iter = self.cutlayer.getFeatures() 
                 for feature in iter:
@@ -210,7 +210,11 @@ class gridSplitter:
                             self.epsg=self.layertocutcrs.toProj4()
                             
                             #TODO calling gdalwarp directly? solves problem with "unprojected" jpg etc., but is OS dependent?
-                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,folder+pref+str(i)+".tif"])
+                            newfile = folder+pref+str(i)+".tif"
+                            if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                if existwarning == 0:
+                                    existwarning = self.exists()
+                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5 -s_srs " + self.layertocutcrs.authid() + "-t_srs " + self.layertocutcrs.authid(),folder +pref + str(i)+ ".tif")
                             
                             if self.dlg.addTiles.isChecked()== True:  
@@ -225,7 +229,11 @@ class gridSplitter:
                                 
                                 #TODO Experimental: Call ogr directly
                                 #	ogr2ogr  -clipsrc  testpolygon1.shp  output.shp            testpolygon2.shp
-                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, folder+ pref +str(i)+".shp", layertocutFilePath])
+                                newfile=folder+ pref +str(i)+".shp"
+                                if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                    if existwarning == 0:
+                                        existwarning = self.exists()
+                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
                                 #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
                                 
                                 if self.dlg.addTiles.isChecked()== True:
@@ -267,7 +275,6 @@ class gridSplitter:
                 self.amount = splicesX * splicesY    
                 goon = self.warn()    
                 if goon == True:  
-                    #TODO warning if first file exists
                     #iterate
                     for i in range(splicesX):
                         for j in range(splicesY):
@@ -286,8 +293,12 @@ class gridSplitter:
                             if not os.path.exists(folder): #create folders
                                 os.makedirs(folder)
                             nodata = layertocut.dataProvider().srcNoDataValue(1) #what about multiband rasters?
+                            newfile = folder+pref+str(i)+"_"+str(j)+".tif"
+                            if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                if existwarning == 0:
+                                    existwarning = self.exists()
                             #TODO experimental
-                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,folder+pref+str(i)+"_"+str(j)+".tif"])
+                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
                             
                             #add raster layer to canvas
@@ -318,7 +329,6 @@ class gridSplitter:
                     self.amount = splicesX*splicesY
                     goon = self.warn()
                     if goon==True:
-                        #TODO warning if first file exists
                         #iterate
                         for i in range(splicesX):
                             for j in range(splicesY):
@@ -336,7 +346,11 @@ class gridSplitter:
                                 if not os.path.exists(folder):
                                     os.makedirs(folder) #make folders
                                 #TODO Experimental: call ogr directly instead of qgis    
-                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, folder+ pref +str(i)+"_"+str(j)+".shp", layertocutFilePath])
+                                newfile = folder+ pref +str(i)+"_"+str(j)+".shp"
+                                if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                    if existwarning == 0:
+                                        existwarning = self.exists()
+                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
                                 #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
                                 
                                 #add to canvas
@@ -392,9 +406,8 @@ class gridSplitter:
             if self.layertocutcrs.authid().startswith('USER'): #user-defined CRS
                 self.epsg = self.layertocutcrs.toWkt()
             else: #EPSG - defined				
-	         self.epsg= self.layertocutcrs.authid()
-	    
-	    cutlayersrs= self.cutlayer.crs()
+                self.epsg= self.layertocutcrs.authid()
+            cutlayersrs= self.cutlayer.crs()
             if cutlayersrs.authid().startswith('USER'): #user-defined CRS
                 srcsrs = cutlayersrs.toWkt()
             else:				#EPSG - defined
@@ -403,7 +416,7 @@ class gridSplitter:
             tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')[1]
             os.remove(tmp)
             c = self.cutlayer.dataProvider().dataSourceUri()
-	    cutlayername= c.split('|')[0]
+            cutlayername= c.split('|')[0]
             call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
             self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
             #new= processing.runalg('qgis:reprojectlayer', cutlayer, self.epsg, None)
@@ -411,3 +424,7 @@ class gridSplitter:
             QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
         else: #don't reproject
             pass
+	  
+    def exists(self):
+      QMessageBox.information(None, "Fiel exists", "Some output files already exist. gridSplitter does not overwrite files, so results may be unexpected")
+      return 1
