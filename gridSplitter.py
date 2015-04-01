@@ -32,7 +32,6 @@ import processing
 import os
 import math
 import tempfile #for temp shapefile naming
-from subprocess import *
 
 
 class gridSplitter:
@@ -214,9 +213,8 @@ class gridSplitter:
                             if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                 if existwarning == 0:
                                     existwarning = self.exists()
-                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
-                            #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5 -s_srs " + self.layertocutcrs.authid() + "-t_srs " + self.layertocutcrs.authid(),folder +pref + str(i)+ ".tif")
-                            
+                            #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5 -s_srs " + self.layertocutcrs.authid() + "-t_srs " + self.layertocutcrs.authid(),folder +pref + str(i)+ ".tif")
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
                                 fileInfo = QFileInfo(folder +pref + str(i)+".tif")
@@ -233,8 +231,8 @@ class gridSplitter:
                                 if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                     if existwarning == 0:
                                         existwarning = self.exists()
-                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
-                                #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
+                                #call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
+                                processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
                                 
                                 if self.dlg.addTiles.isChecked()== True:
                                     layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
@@ -298,8 +296,8 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             #TODO experimental
-                            call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
-                            #processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                            #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
                             
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
@@ -350,8 +348,8 @@ class gridSplitter:
                                 if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                     if existwarning == 0:
                                         existwarning = self.exists()
-                                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
-                                #processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                                #call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
+                                processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+"_"+str(j)+".shp")
                                 
                                 #add to canvas
                                 if self.dlg.addTiles.isChecked()== True:
@@ -417,10 +415,10 @@ class gridSplitter:
             os.remove(tmp)
             c = self.cutlayer.dataProvider().dataSourceUri()
             cutlayername= c.split('|')[0]
-            call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
-            self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
-            #new= processing.runalg('qgis:reprojectlayer', cutlayer, self.epsg, None)
-            #cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
+            #call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
+            #self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
+            new= processing.runalg('qgis:reprojectlayer', cutlayer, self.epsg, None)
+            self.cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
             QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
         else: #don't reproject
             pass
