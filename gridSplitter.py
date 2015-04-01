@@ -185,6 +185,7 @@ class gridSplitter:
         tilesizeY= float(self.dlg.tileSizeY.value())
         index = self.dlg.inputRasterBox.currentIndex()
         layertocut = self.dlg.inputRasterBox.itemData(index)
+        #get a temp file name. Process should be less ugly
         tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
         os.close(tmpc)
         os.remove(self.temp)
@@ -225,8 +226,8 @@ class gridSplitter:
                             if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                 if existwarning == 0:
                                     existwarning = self.exists()
-                            #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "0.5", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 0.5", folder +pref + str(i)+ ".tif")
+                            #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
+                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 1", folder +pref + str(i)+ ".tif")
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
                                 fileInfo = QFileInfo(folder +pref + str(i)+".tif")
