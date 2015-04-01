@@ -48,12 +48,12 @@
     <attribute name="title">
      <string>Parameters</string>
     </attribute>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>7</x>
        <y>14</y>
-       <width>551</width>
+       <width>552</width>
        <height>421</height>
       </rect>
      </property>
@@ -91,42 +91,10 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="6">
-       <widget class="QgsSpinBox" name="splicesYSpinBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-      </item>
       <item row="6" column="2" colspan="3">
        <widget class="QLineEdit" name="OuptDir">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="6">
-       <widget class="QgsSpinBox" name="splicesXSpinBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
-        </property>
-        <property name="value">
-         <number>5</number>
         </property>
        </widget>
       </item>
@@ -144,22 +112,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="6">
-       <widget class="QgsDoubleSpinBox" name="tileSizeX">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>999999999.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="1" colspan="2">
        <widget class="QRadioButton" name="cutLayerRadio">
         <property name="toolTip">
@@ -167,16 +119,6 @@
         </property>
         <property name="text">
          <string>cut layer</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3" colspan="4">
-       <widget class="QgsMapLayerComboBox" name="cutLayerBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="filters">
-         <set>QgsMapLayerProxyModel::PolygonLayer</set>
         </property>
        </widget>
       </item>
@@ -215,22 +157,6 @@
         <property name="text">
          <string>tile size 
 (in input map units)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="6">
-       <widget class="QgsDoubleSpinBox" name="tileSizeY">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>999999999.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -274,18 +200,75 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3" colspan="4">
-       <widget class="QgsMapLayerComboBox" name="inputRasterBox">
+      <item row="0" column="4" colspan="3">
+       <widget class="QComboBox" name="inputRasterBox"/>
+      </item>
+      <item row="1" column="6">
+       <widget class="QSpinBox" name="splicesXSpinBox">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The layer you want to cut. It will not be modified.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="frame">
-         <bool>true</bool>
+        <property name="minimum">
+         <number>1</number>
         </property>
-        <property name="filters">
-         <set>QgsMapLayerProxyModel::HasGeometry|QgsMapLayerProxyModel::LineLayer|QgsMapLayerProxyModel::PointLayer|QgsMapLayerProxyModel::PolygonLayer|QgsMapLayerProxyModel::RasterLayer</set>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+        <property name="value">
+         <number>5</number>
         </property>
        </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QSpinBox" name="splicesYSpinBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify how many tiles you want in this axis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6">
+       <widget class="QDoubleSpinBox" name="tileSizeX">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="6">
+       <widget class="QDoubleSpinBox" name="tileSizeY">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the size in map units of the input file CRS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="4" colspan="3">
+       <widget class="QComboBox" name="cutLayerBox"/>
       </item>
      </layout>
     </widget>
@@ -398,25 +381,7 @@ If the cut layer is in a different projection than the input file, there will be
    </widget>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header>qgsdoublespinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QgsMapLayerComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsmaplayercombobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QgsSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>qgsspinbox.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
-  <tabstop>inputRasterBox</tabstop>
   <tabstop>numberTilesRadio</tabstop>
   <tabstop>splicesXSpinBox</tabstop>
   <tabstop>splicesYSpinBox</tabstop>
@@ -424,7 +389,6 @@ If the cut layer is in a different projection than the input file, there will be
   <tabstop>tileSizeX</tabstop>
   <tabstop>tileSizeY</tabstop>
   <tabstop>cutLayerRadio</tabstop>
-  <tabstop>cutLayerBox</tabstop>
   <tabstop>OuptDir</tabstop>
   <tabstop>cmdBrowseOutput</tabstop>
   <tabstop>prefixx</tabstop>

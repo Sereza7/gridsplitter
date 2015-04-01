@@ -23,6 +23,7 @@
 
 import os
 from PyQt4 import QtCore, QtGui, uic
+from qgis.gui import *
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'gridSplitter_dialog_base.ui'))
