@@ -402,7 +402,6 @@ class gridSplitter:
         #create tempfile, write stuff in it
         writer = QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.layertocutcrs,"ESRI Shapefile")
         #close tempfile, unlock it. Windows 7 demands it, else it will reuse the same polygon over and over
-        QgsVectorFileWriter
         del writer
     
     def warn(self):
