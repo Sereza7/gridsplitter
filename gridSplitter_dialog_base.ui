@@ -122,16 +122,6 @@
         </property>
        </widget>
       </item>
-<<<<<<< HEAD
-=======
-      <item row="5" column="3" colspan="4">
-       <widget class="QgsMapLayerComboBox" name="cutLayerBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
->>>>>>> b8adfb427e272faa58325879b48caa64f4ac2c33
       <item row="7" column="0">
        <widget class="QLabel" name="label_8">
         <property name="toolTip">
@@ -256,12 +246,9 @@
         <property name="maximum">
          <double>999999999.000000000000000</double>
         </property>
-<<<<<<< HEAD
         <property name="value">
          <double>1.000000000000000</double>
         </property>
-=======
->>>>>>> b8adfb427e272faa58325879b48caa64f4ac2c33
        </widget>
       </item>
       <item row="4" column="6">
