@@ -175,9 +175,6 @@
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="filters">
-         <set>QgsMapLayerProxyModel::PolygonLayer</set>
-        </property>
        </widget>
       </item>
       <item row="7" column="0">
@@ -281,9 +278,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-        <property name="filters">
-         <set>QgsMapLayerProxyModel::HasGeometry|QgsMapLayerProxyModel::LineLayer|QgsMapLayerProxyModel::PointLayer|QgsMapLayerProxyModel::PolygonLayer|QgsMapLayerProxyModel::RasterLayer</set>
         </property>
        </widget>
       </item>
