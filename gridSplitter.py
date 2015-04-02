@@ -196,10 +196,6 @@ class gridSplitter:
         tilesizeY= float(self.dlg.tileSizeY.value())
         index = self.dlg.inputRasterBox.currentIndex()
         layertocut = self.dlg.inputRasterBox.itemData(index)
-        #get a temp file name. Process should be less ugly
-        #tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
-        #os.close(tmpc)
-        #os.remove(self.temp)
         pref = self.dlg.prefixx.text()
         self.layertocutcrs= layertocut.crs()   
         ext = layertocut.extent()
@@ -237,7 +233,7 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             if self.checkgdal()==True:
-                                call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
+                                call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             else:
                                 k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False, "-cblend 1", folder +pref + str(i)+ ".tif")
                                 del k
@@ -258,7 +254,7 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.checkgdal()==True:
-                                    call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
+                                    call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
                                 else:
                                     k= processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
                                     del k
@@ -326,7 +322,7 @@ class gridSplitter:
                             
                             #TODO experimental
                             if self.checkgdal()==True:
-                                call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
+                                call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             else:
                                 k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , nodata, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
                                 del k
@@ -380,7 +376,7 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.checkgdal()==True:
-                                    call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
+                                    call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
                                 else: 
                                     k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str(i)+"_"+str(j)+".shp")
                                     del k
@@ -457,7 +453,7 @@ class gridSplitter:
             c = self.cutlayer.dataProvider().dataSourceUri()
             cutlayername= c.split('|')[0]
             if self.checkgdal()==True:
-                call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
+                call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
                 self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
             else:
                 new= processing.runalg('qgis:reprojectlayer', self.cutlayer, self.epsg, None)
