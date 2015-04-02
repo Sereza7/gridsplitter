@@ -22,7 +22,15 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
-v.0.3.2 minor changes
+v.0.3.2 minor changes and bug fix
+
+    added gdalwarp/ogr2ogr directly; (better use of nodata, more raster types supported)
+    
+    removed everything to do with qgis.gui, as it didn't work on W7
+    
+    worked around file locking of tempfiles
+    
+	
     moved "tempfile" to automatic handling
 	
     added reprojection of cutlayer if desired
@@ -34,6 +42,7 @@ v.0.3.2 minor changes
     cut raster by cutlayer: no more gaps
 
 v 0.3.1 bugfix for 0.3.0
+
     typo in "raster by tile size" fixed
 
     typos which affected polygon cutting and naming
@@ -41,7 +50,9 @@ v 0.3.1 bugfix for 0.3.0
     general rewrite for readability
 
 v 0.3: new features
+
     Added option to cut by map units, and to cut by cutlayer features
 
 v 0.2: new feature
+
     Map tiles can be added to canvas after running
