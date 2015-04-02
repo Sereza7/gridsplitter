@@ -162,10 +162,13 @@ class gridSplitter:
          self.gdalprefix = QgsApplication.prefixPath()+ '/../../bin/'
      else:
         self.gdalprefix = ""
+     #checking once if GDAL exists
+     #TODO check with different paths, e.g QgsApplication.prefixPath()+'/bin'
+     self.gdalexists= self.checkgdal()
      #fill layers:
      self.dlg.cutLayerBox.clear()
      self.dlg.inputRasterBox.clear()
-	      
+     
      layers = QgsMapLayerRegistry.instance().mapLayers().values()
      for layer in layers:
         if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QGis.Polygon:
@@ -232,7 +235,7 @@ class gridSplitter:
                             if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                 if existwarning == 0:
                                     existwarning = self.exists()
-                            if self.checkgdal()==True:
+                            if gdalexists==True:
                                 call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             else:
                                 k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False, "-cblend 1", folder +pref + str(i)+ ".tif")
@@ -253,7 +256,7 @@ class gridSplitter:
                                 if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                     if existwarning == 0:
                                         existwarning = self.exists()
-                                if self.checkgdal()==True:
+                                if self.gdalexists ==True:
                                     call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
                                 else:
                                     k= processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
@@ -321,7 +324,7 @@ class gridSplitter:
                                     existwarning = self.exists()
                             
                             #TODO experimental
-                            if self.checkgdal()==True:
+                            if self.gdalexists ==True:
                                 call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
                             else:
                                 k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , nodata, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
@@ -375,7 +378,7 @@ class gridSplitter:
                                 if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                     if existwarning == 0:
                                         existwarning = self.exists()
-                                if self.checkgdal()==True:
+                                if self.gdalexists==True:
                                     call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
                                 else: 
                                     k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str(i)+"_"+str(j)+".shp")
@@ -452,7 +455,7 @@ class gridSplitter:
             os.remove(tmp)
             c = self.cutlayer.dataProvider().dataSourceUri()
             cutlayername= c.split('|')[0]
-            if self.checkgdal()==True:
+            if self.gdalexists==True:
                 call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername])
                 self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
             else:
