@@ -5,8 +5,9 @@ Welcome to gridSplitter's documentation!
 Concept
 =================
 
-The gridSplitter is written to cleanly cut input features. It is a wrapper for gdalogr/cliprasterbymasklayer
-and qgis:intersection. 
+The gridSplitter is written to cleanly cut input features. It is a wrapper for either gdalogr/cliprasterbymasklayer
+and qgis:intersection  or, if found, gdalwarp/ogr2ogr.
+
 It has several options:
 
 The first option, cut by tile number (v.0.1), takes the extent of the input data, divides it by a number of 
@@ -65,3 +66,11 @@ Cutting by Layer:
 
 A tile for every feature will be created. If the CutLayer is in a non-matching projection, a reprojection will be attempted. 
 (original file won't be modified)
+
+
+Why using gdal/ogr binaries directly?
+==================
+They close the file after using properly, so  temp files can be deleted
+It supports more input data (e.g. georeferenced jpg)
+possibility to change things later on (cblend, nodata value, ...)
+using one less layer of things should speed it up a bit.
