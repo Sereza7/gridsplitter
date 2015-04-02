@@ -155,6 +155,9 @@ class gridSplitter:
      #loop the GUI until each required parameter is checked
      chekk="0"
      #fill layers:
+     self.dlg.cutLayerBox.clear()
+     self.dlg.inputRasterBox.clear()
+     
      layers = QgsMapLayerRegistry.instance().mapLayers().values()
      for layer in layers:
         if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QGis.Polygon:
@@ -186,9 +189,9 @@ class gridSplitter:
         index = self.dlg.inputRasterBox.currentIndex()
         layertocut = self.dlg.inputRasterBox.itemData(index)
         #get a temp file name. Process should be less ugly
-        tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
-        os.close(tmpc)
-        os.remove(self.temp)
+        #tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
+        #os.close(tmpc)
+        #os.remove(self.temp)
         pref = self.dlg.prefixx.text()
         self.layertocutcrs= layertocut.crs()   
         ext = layertocut.extent()
@@ -227,7 +230,8 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp, None, False, False, "-cblend 1", folder +pref + str(i)+ ".tif")
+                            k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False, "-cblend 1", folder +pref + str(i)+ ".tif")
+                            del k
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
                                 fileInfo = QFileInfo(folder +pref + str(i)+".tif")
@@ -245,8 +249,8 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 #call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath])
-                                processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
-                                
+                                k= processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str(i)+".shp")
+                                del k
                                 if self.dlg.addTiles.isChecked()== True:
                                     layer = QgsVectorLayer(folder+ pref +str(i)+".shp" , pref +str(i), "ogr")
                                     QgsMapLayerRegistry.instance().addMapLayer(layer)
@@ -308,10 +312,11 @@ class gridSplitter:
                             if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
                                 if existwarning == 0:
                                     existwarning = self.exists()
+                            
                             #TODO experimental
                             #call(["gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile])
-                            processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , None, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
-                            
+                            k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , nodata, False, False, "",folder +pref + str(i)+"_"+str(j)+".tif")
+                            del k
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
                                 fileInfo = QFileInfo(folder +pref + str(i)+"_"+str(j)+".tif")
@@ -362,8 +367,8 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 #call(["ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath])
-                                processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str(i)+"_"+str(j)+".shp")
-                                
+                                k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str(i)+"_"+str(j)+".shp")
+                                del k
                                 #add to canvas
                                 if self.dlg.addTiles.isChecked()== True:
                                     layer = QgsVectorLayer(folder+ pref +str(i)+"_"+str(j)+".shp" , pref +str(i)+"_"+str(j), "ogr")
@@ -376,17 +381,15 @@ class gridSplitter:
                         
     def cleanup(self):
         QgsMapLayerRegistry.instance().removeMapLayers( [self.gridtmp.id()] )
+        #close self.temp if it's open still
+        if os.path.isfile(self.temp): #does not work on win7. runalg keeps them open
+            QgsVectorFileWriter.deleteShapeFile(self.temp)
         cpg = self.temp[:-4]+ ".cpg"
         if os.path.isfile(cpg):
             os.remove(cpg)
             
     def temppolygon(self):
-        #delete tempfile. windows won't overwrite it
-        if os.path.isfile(self.temp):
-            os.remove(self.temp)
-        if os.path.isfile(self.temp):
-            QgsVectorFileWriter.deleteShapeFile(self.temp)
-        #stop the annoying asks with user-defined CRS
+       #stop the annoying asks with user-defined CRS
         if self.layertocutcrs.authid().startswith('USER'):
             self.epsg = self.layertocutcrs.toWkt()
         else:
@@ -401,10 +404,15 @@ class gridSplitter:
         pr.addFeatures( [ fet ] )
         self.gridtmp.commitChanges()
         #create tempfile, write stuff in it
+        #get a temp file name. Process should be less ugly
+        tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
+        os.close(tmpc)
+        os.remove(self.temp)
         writer = QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.layertocutcrs,"ESRI Shapefile")
-        #close tempfile, unlock it. Windows 7 demands it, else it will reuse the same polygon over and over
+        #close tempfile
         del writer
-    
+        
+        
     def warn(self):
         message= "you are about to make up to " + str(self.amount) + " tiles. Continue?"
         k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.Abort)
@@ -437,6 +445,7 @@ class gridSplitter:
             #self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
             new= processing.runalg('qgis:reprojectlayer', self.cutlayer, self.epsg, None)
             self.cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
+            del new
             QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
         else: #don't reproject
             pass
