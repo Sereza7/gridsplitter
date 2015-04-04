@@ -45,6 +45,9 @@ the tiles.
 
 Optional Parameters
 ...................
+:tile index creation: A tile index shapefile will be created in the Output base folder, storing the bounding boxes of all output files. 
+
+ :write absolute path: The tile index created will be filled with absoulte file paths instead of relative ones.
 
 :prefix: The prefix output files will have.
 
