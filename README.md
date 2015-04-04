@@ -3,7 +3,7 @@ A QGIS plugin that creates tiles from an input layer
 =================
 
 The gridSplitter is written to cleanly cut input features. It is a wrapper for gdalogr:cliprasterbymasklayer
-and qgis:intersection. It takes the extent of the input data, divides it by a number of pieces and saves 
+and qgis:intersection or, if found, gdal/ogr. It takes the extent of the input data, divides it by a number of pieces and saves 
 those pieces to an output directory and subdirectories. 
 
 It aims to be functional in any coordinate reference 
@@ -22,6 +22,12 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
+v.0.3.3 minor changes
+
+    added error log into temp directory
+    
+    added tileindex creation
+
 v.0.3.2 minor changes and bug fix
 
     added gdalwarp/ogr2ogr directly; (better use of nodata, more raster types supported)
