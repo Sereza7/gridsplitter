@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>572</width>
+    <width>522</width>
     <height>524</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>170</x>
      <y>490</y>
      <width>341</width>
      <height>32</height>
@@ -37,7 +37,7 @@
     <rect>
      <x>0</x>
      <y>10</y>
-     <width>571</width>
+     <width>521</width>
      <height>481</height>
     </rect>
    </property>
@@ -53,51 +53,11 @@
       <rect>
        <x>7</x>
        <y>14</y>
-       <width>552</width>
+       <width>506</width>
        <height>421</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="6" column="0" colspan="2">
-       <widget class="QLabel" name="label_6">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Output Base Directory</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4" colspan="2">
-       <widget class="QLabel" name="label_5">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>number of tiles (Y axis)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="5" colspan="2">
-       <widget class="QPushButton" name="cmdBrowseOutput">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2" colspan="3">
-       <widget class="QLineEdit" name="OuptDir">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="4">
        <widget class="QLabel" name="label_14">
         <property name="text">
@@ -105,40 +65,10 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="4">
-       <widget class="QLineEdit" name="prefixx">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1" colspan="2">
-       <widget class="QRadioButton" name="cutLayerRadio">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_18">
         <property name="text">
-         <string>cut layer</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>prefix for output files:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1" colspan="2">
-       <widget class="QCheckBox" name="addTiles">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the created files to QGIS. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Add tiles to canvas</string>
+         <string>Method:</string>
         </property>
        </widget>
       </item>
@@ -146,6 +76,26 @@
        <widget class="QLabel" name="label_15">
         <property name="text">
          <string>tile size (Y axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" colspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>number of tiles (X axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Input Layer:</string>
         </property>
        </widget>
       </item>
@@ -160,20 +110,23 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_18">
-        <property name="text">
-         <string>Method:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" colspan="2">
-       <widget class="QLabel" name="label_4">
+      <item row="2" column="4" colspan="2">
+       <widget class="QLabel" name="label_5">
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>number of tiles (X axis)</string>
+         <string>number of tiles (Y axis)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="2">
+       <widget class="QRadioButton" name="cutLayerRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify a polygon vector layer that is loaded in QGIS. For each feature, there will be a tile created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>cut layer</string>
         </property>
        </widget>
       </item>
@@ -190,18 +143,28 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="6" column="0" colspan="2">
+       <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="locale">
          <locale language="English" country="UnitedStates"/>
         </property>
         <property name="text">
-         <string>Input Layer:</string>
+         <string>Output Base Directory</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4" colspan="3">
-       <widget class="QComboBox" name="inputRasterBox"/>
+      <item row="7" column="1" colspan="2">
+       <widget class="QCheckBox" name="addTiles">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the created files to QGIS. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Add tiles to canvas</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="6">
        <widget class="QSpinBox" name="splicesXSpinBox">
@@ -267,11 +230,156 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="4" colspan="3">
+      <item row="0" column="2" colspan="5">
+       <widget class="QComboBox" name="inputRasterBox"/>
+      </item>
+      <item row="5" column="3" colspan="4">
        <widget class="QComboBox" name="cutLayerBox"/>
+      </item>
+      <item row="6" column="6">
+       <widget class="QPushButton" name="cmdBrowseOutput">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="4">
+       <widget class="QLineEdit" name="OuptDir">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>additional options</string>
+    </attribute>
+    <widget class="QCheckBox" name="tileindexCheck">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>190</y>
+       <width>375</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A tile index is a shapefile that stores the information of all outputs' extent as polygons. It will be stored in Outputbasefolder/tileindex.shp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Create Tile index tileindex.shp (requires gdaltindex/ogrtindex)</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="absolutePathCheck">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>210</y>
+       <width>134</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write the tile index information in absolute paths instead of relative to the index file's position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>write absolute path</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>150</y>
+       <width>267</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>prefix for output files:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="prefixx">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;optional: If you want a different name than [tileX]_[tiley], you can add a prefix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>x_y</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>30</y>
+       <width>311</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Sorting of output files:</string>
+     </property>
+     <widget class="QRadioButton" name="subfolderRadio">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>248</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There will be subfolders made for paths and rows of tile creation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Subfolders</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="nosubfolderRadio">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>248</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;all output files will be stored in the base Folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>all in one folder</string>
+      </property>
+     </widget>
+    </widget>
+    <zorder>layoutWidget</zorder>
+    <zorder>tileindexCheck</zorder>
+    <zorder>absolutePathCheck</zorder>
+    <zorder>groupBox</zorder>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -391,7 +499,6 @@ If the cut layer is in a different projection than the input file, there will be
   <tabstop>cutLayerRadio</tabstop>
   <tabstop>OuptDir</tabstop>
   <tabstop>cmdBrowseOutput</tabstop>
-  <tabstop>prefixx</tabstop>
   <tabstop>addTiles</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>button_box</tabstop>
