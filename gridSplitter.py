@@ -168,10 +168,10 @@ class gridSplitter:
      
      layers = QgsMapLayerRegistry.instance().mapLayers().values()
      for layer in layers:
-        if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QGis.Polygon:
-             self.dlg.cutLayerBox.addItem( layer.name(), layer ) 
-        #if it is a valid filename, add
-        self.dlg.inputRasterBox.addItem(layer.name(), layer)
+         if layer.dataProvider().description().startswith('GDAL') or layer.dataProvider().description().startswith('OGR'): 
+            if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QGis.Polygon:
+                self.dlg.cutLayerBox.addItem( layer.name(), layer ) 
+            self.dlg.inputRasterBox.addItem(layer.name(), layer)
         
      while chekk != "1": 
         self.dlg.show() #0 Run the dialog event loop
