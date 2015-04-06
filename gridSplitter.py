@@ -241,12 +241,12 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             if self.gdalexists==True:
-                                errx= call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-cblend", "1", "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stderr=self.errorfile)
+                                errx= call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-wo","CUTLINE_ALL_TOUCHED=TRUE","-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stderr=self.errorfile)
                                 if errx==1:
                                     self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
                             else:
-                                k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False, "-cblend 1", folder +pref + str('%04d' %(i))+ ".tif")
+                                k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False,"-wo CUTLINE_ALL_TOUCHED=TRUE", folder +pref + str('%04d' %(i))+ ".tif")
                                 del k
                             if self.dlg.addTiles.isChecked()== True:  
                                 #add raster layer to canvas
