@@ -136,15 +136,15 @@ class gridSplitter:
                     if self.cutlayer != "": #check if cutlayer exists
                         return "1"
                     else: #if cutlayer does not exist
-                        QMessageBox.information(None,"No cut layer!", "Please specify a cut layer")
+                        QMessageBox.information(None,self.tr("No cut layer!"), self.tr("Please specify a cut layer"))
                         return "0" 
                 else: 
                     return "1"
             else:
-                QMessageBox.information(None, "Grid Splitter", "Please specify output directory")
+                QMessageBox.information(None, "Grid Splitter", self.tr("Please specify output directory"))
                 return "0"
         else:
-            QMessageBox.information(None, "Grid Splitter", "Please specify layer")
+            QMessageBox.information(None, "Grid Splitter", self.tr("Please specify layer"))
             return "0"
 
 
@@ -458,7 +458,7 @@ class gridSplitter:
         
         
     def warn(self):
-        message= "you are about to make up to " + str(self.amount) + " tiles. Continue?"
+        message= self.tr("you are about to make up to ") + str(self.amount) + self.tr(" tiles. Continue?")
         k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.Abort)
         if k == QMessageBox.Yes:
             return True
@@ -467,7 +467,7 @@ class gridSplitter:
 
     def reprojectTempFile(self):
         #reproject cutlayer into temporary memory layer
-        message= "The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?"
+        message= self.tr("The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?")
         k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.No)
         if k == QMessageBox.Yes:
             if self.layertocutcrs.authid().startswith('USER'): #user-defined CRS
@@ -500,7 +500,7 @@ class gridSplitter:
             pass
 
     def exists(self):
-      QMessageBox.information(None, "File exists", "Some output files already exist. gridSplitter does not overwrite files, so results may be unexpected")
+      QMessageBox.information(None, self.tr("File exists"), self.tr("Some output files already exist. gridSplitter does not overwrite files, so results may be unexpected"))
       return 1
       
     def checkgdal(self):
@@ -514,7 +514,7 @@ class gridSplitter:
 
     def errorlog(self):
         if self.existerror == 0:
-            QMessageBox.information(None, "Grid Splitter", "There was an error executing. See log for additional details")
+            QMessageBox.information(None, "Grid Splitter", self.tr("There was an error executing. See log for additional details"))
             self.existerror = 1
         errormessage= self.errmsg + os.linesep
         os.write(self.errorfile, errormessage)

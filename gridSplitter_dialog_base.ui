@@ -58,65 +58,10 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="4">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>tile size (X axis)</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_18">
         <property name="text">
          <string>Method:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
-       <widget class="QLabel" name="label_15">
-        <property name="text">
-         <string>tile size (Y axis)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" colspan="2">
-       <widget class="QLabel" name="label_4">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>number of tiles (X axis)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Input Layer:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="3">
-       <widget class="QRadioButton" name="tileSizeRadio">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify the size of the tiles. If the resolution does not allow this size, it will be up to one resolution pixel bigger&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>tile size 
-(in input map units)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4" colspan="2">
-       <widget class="QLabel" name="label_5">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>number of tiles (Y axis)</string>
         </property>
        </widget>
       </item>
@@ -127,42 +72,6 @@
         </property>
         <property name="text">
          <string>cut layer</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="QRadioButton" name="numberTilesRadio">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the number of tiles you want.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>number of tiles</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0" colspan="2">
-       <widget class="QLabel" name="label_6">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="text">
-         <string>Output Base Directory</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1" colspan="2">
-       <widget class="QCheckBox" name="addTiles">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the created files to QGIS. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Add tiles to canvas</string>
         </property>
        </widget>
       </item>
@@ -246,10 +155,119 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="2" colspan="4">
+      <item row="1" column="3" colspan="3">
+       <widget class="QLabel" name="label_4">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>number of tiles (X axis)</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" colspan="3">
+       <widget class="QLabel" name="label_5">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>number of tiles (Y axis)</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_3">
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Input Layer:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" rowspan="2" colspan="2">
+       <widget class="QRadioButton" name="tileSizeRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;specify the size of the tiles. If the resolution does not allow this size, it will be up to one resolution pixel bigger&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>tile size 
+(in input map units)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" rowspan="2" colspan="2">
+       <widget class="QRadioButton" name="numberTilesRadio">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the number of tiles you want.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>number of tiles</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="3" colspan="3">
        <widget class="QLineEdit" name="OuptDir">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The directory where the output is stored.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Output Base Directory</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1" colspan="3">
+       <widget class="QCheckBox" name="addTiles">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the created files to QGIS. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Add tiles to canvas</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3" colspan="3">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>tile size (X axis)</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3" colspan="3">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>tile size (Y axis)</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -265,7 +283,7 @@
       <rect>
        <x>70</x>
        <y>190</y>
-       <width>375</width>
+       <width>441</width>
        <height>18</height>
       </rect>
      </property>
@@ -281,7 +299,7 @@
       <rect>
        <x>120</x>
        <y>210</y>
-       <width>134</width>
+       <width>371</width>
        <height>18</height>
       </rect>
      </property>
@@ -398,15 +416,15 @@
       <locale language="English" country="UnitedStates"/>
      </property>
      <property name="text">
-      <string>Version 0.3.2  Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
+      <string>Version 0.3.3  Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>1</x>
-       <y>14</y>
-       <width>541</width>
+       <x>0</x>
+       <y>10</y>
+       <width>511</width>
        <height>411</height>
       </rect>
      </property>
@@ -419,7 +437,7 @@
         <property name="text">
          <string>gridSplitter cuts your input layer into pieces.
 If it is a raster, it tries to keep the raster's resolution to avoid gaps and overlaps.
-If the number of splices and the resolution don't match up, it cuts slightly larger tiles, resulting in the last tile having a bit of &quot;no Data&quot;.
+If the number of tiles and the resolution don't match up, it cuts slightly larger tiles, resulting in the last tile having a bit of &quot;no Data&quot;.
 The output is stored in subdirectories in TIF file format.
 Vector layers will be stored in shapefile format.</string>
         </property>
