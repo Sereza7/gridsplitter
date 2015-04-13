@@ -340,7 +340,6 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             
-                            #TODO experimental
                             if self.gdalexists ==True:
                                 errx=call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stdin=PIPE, stdout=self.logfile,stderr=self.errorfile)
                                 if errx==1:
@@ -499,11 +498,11 @@ class gridSplitter:
       
     def checkgdal(self):
     #check if GDALWARP is in the %Path. Assuming, ogr2ogr is there, too
-        try:
-            check_output(self.gdalprefix+'gdalwarp')
-        except OSError: #windows throws error here even if found. Switch?! Also, check why gdal outputs empty in W7
+        try: 
+            call(self.gdalprefix+'gdalwarp')
+        except OSError:
             return False
-        except CalledProcessError:
+        else:
             return True
 
     def errorlog(self):
