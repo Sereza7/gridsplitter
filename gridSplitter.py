@@ -244,6 +244,7 @@ class gridSplitter:
                                     existwarning = self.exists()
                             if self.gdalexists==True:
                                 errx= call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-wo","CUTLINE_ALL_TOUCHED=TRUE","-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stdin=PIPE, stdout=self.logfile,stderr=self.errorfile)
+                                
                                 if errx==1:
                                     self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
@@ -472,7 +473,7 @@ class gridSplitter:
             self.epsg = self.layertocutcrs.toProj4()
             cutlayersrs= self.cutlayer.crs()
             srcsrs = cutlayersrs.toProj4()
-            #reproject TODO with ogr2ogr
+
             tmpc, tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_reprojectedlayer_')
             os.close(tmpc)
             os.remove(tmp)
@@ -545,3 +546,4 @@ class gridSplitter:
                         call([self.gdalprefix+'ogrtindex',self.outputfolder+os.sep+pref+"tileindex.shp",f1],stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile)
             layer = QgsVectorLayer(self.outputfolder+os.sep+pref+"tileindex.shp" , pref+"tileindex", "ogr")
             QgsMapLayerRegistry.instance().addMapLayer(layer)
+
