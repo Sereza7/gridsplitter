@@ -53,6 +53,8 @@ Optional Parameters
 
 :add to map layer: The layers created will be loaded into QGIS.
 
+:create tileindex: Uses gdaltindex for creating a shapefile that contains spatial information about every file created. 
+
 Methods
 ================
 gridSplitter offers three methods for splitting. Cutting by tile number, cutting by tile size, and cutting by layer feature,
@@ -77,3 +79,4 @@ They close the file after using properly, so  temp files can be deleted
 It supports more input data (e.g. georeferenced jpg)
 possibility to change things later on (cblend, nodata value, ...)
 using one less layer of things should speed it up a bit.
+

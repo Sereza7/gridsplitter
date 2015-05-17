@@ -24,6 +24,10 @@ Changelog
 =================
 v.0.3.3 minor changes
 
+    translation to german
+
+    improved finding of GDAL in WIN
+
     added error log into temp directory
     
     added tileindex creation
