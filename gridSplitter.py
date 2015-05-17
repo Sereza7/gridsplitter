@@ -521,7 +521,7 @@ class gridSplitter:
     def tileindex(self):
         if self.dlg.tileindexCheck.isChecked():
             pref= self.dlg.prefixx.text()
-            path=unicode(self.outputfolder,utf8)
+            path=unicode(self.outputfolder,"utf8")
             index = self.dlg.inputRasterBox.currentIndex()
             layertocut = self.dlg.inputRasterBox.itemData(index)
             self.epsg=layertocut.crs().toProj4()
