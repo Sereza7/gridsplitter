@@ -29,7 +29,7 @@ from gridSplitter_dialog import gridSplitterDialog
 from qgis.core import * 
 import os, os.path, processing, math, time
 import tempfile #for temp shapefile naming
-from subprocess import call, CalledProcessError, check_output, PIPE
+from subprocess import call, CalledProcessError, check_output, PIPE, Popen
 from glob import glob
 
 class gridSplitter:
@@ -243,7 +243,9 @@ class gridSplitter:
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             if self.gdalexists==True:
-                                errx= call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-wo","CUTLINE_ALL_TOUCHED=TRUE","-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stdin=PIPE, stdout=self.logfile,stderr=self.errorfile)
+                                self.Popenargs=[self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-wo","CUTLINE_ALL_TOUCHED=TRUE","-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile]
+                              
+                                errx= self.runPopen()
                                 if errx==1:
                                     self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
@@ -265,7 +267,8 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.gdalexists ==True:
-                                    errx= call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath],stdin=PIPE, stdout=self.logfile, stderr=self.errorfile)
+                                    self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath]
+                                    errx=self.runPopen()
                                     if errx==1:
                                         self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
                                         self.errorlog() 
@@ -341,7 +344,8 @@ class gridSplitter:
                                     existwarning = self.exists()
                             
                             if self.gdalexists ==True:
-                                errx=call([self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile],stdin=PIPE, stdout=self.logfile,stderr=self.errorfile)
+                                self.Popenargs=[self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile]
+                                errx=self.runPopen()
                                 if errx==1:
                                     self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
@@ -403,7 +407,8 @@ class gridSplitter:
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.gdalexists==True:
-                                    errx=call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath],stdin=PIPE, stdout=self.logfile, stderr=self.errorfile)
+                                    self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath]
+                                    errx=self.runPopen()
                                     if errx==1:
                                         self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
                                         self.errorlog()
@@ -479,7 +484,8 @@ class gridSplitter:
             c = self.cutlayer.dataProvider().dataSourceUri()
             cutlayername= c.split('|')[0]
             if self.gdalexists==True:
-                errx=call([self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername],stdin=PIPE, stdout=self.logfile, stderr=self.errorfile)
+                self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername]
+                errx=self.runPopen()
                 self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
                 if errx==1:
                     self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
@@ -515,7 +521,7 @@ class gridSplitter:
     def tileindex(self):
         if self.dlg.tileindexCheck.isChecked():
             pref= self.dlg.prefixx.text()
-            path=self.outputfolder
+            path=unicode(self.outputfolder,utf8)
             index = self.dlg.inputRasterBox.currentIndex()
             layertocut = self.dlg.inputRasterBox.itemData(index)
             self.epsg=layertocut.crs().toProj4()
@@ -534,14 +540,28 @@ class gridSplitter:
             if self.dlg.absolutePathCheck.isChecked():
                 for f1 in files:
                     if layertocut.type()== QgsMapLayer.RasterLayer:
-                        call([self.gdalprefix+'gdaltindex',"-write_absolute_path",'-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1],stdin=PIPE, stdout=self.logfile, stderr=self.errorfile)
+                        self.Popenargs=[self.gdalprefix+'gdaltindex',"-write_absolute_path",'-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                        self.runPopen()
                     if layertocut.type()== QgsMapLayer.VectorLayer: #slightly different args
-                        call([self.gdalprefix+'ogrtindex',"-write_absolute_path",self.outputfolder+os.sep+pref+"tileindex.shp",f1],stdin=PIPE, stdout=self.logfile, stderr=self.errorfile)
+                        self.Popenargs=[self.gdalprefix+'ogrtindex',"-write_absolute_path",self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                        self.runPopen()
             else:
                 for f1 in files:
                     if layertocut.type()== QgsMapLayer.RasterLayer:
-                        call([self.gdalprefix+'gdaltindex','-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1],stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile)
+                        self.Popenargs=[self.gdalprefix+'gdaltindex','-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                        self.runPopen()
                     if layertocut.type()== QgsMapLayer.VectorLayer: #slightly different args
-                        call([self.gdalprefix+'ogrtindex',self.outputfolder+os.sep+pref+"tileindex.shp",f1],stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile)
+                        self.Popenargs=[self.gdalprefix+'ogrtindex',self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                        self.runPopen()
             layer = QgsVectorLayer(self.outputfolder+os.sep+pref+"tileindex.shp" , pref+"tileindex", "ogr")
             QgsMapLayerRegistry.instance().addMapLayer(layer)
+            
+            
+    def runPopen(self):
+        if os.name=="nt":
+            p=Popen(self.Popenargs,stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile, creationflags=0x08000000)
+            e=p.wait()
+        else:
+            p=Popen(self.Popenargs, stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile)
+            e=p.wait()
+        return e
