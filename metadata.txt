@@ -13,7 +13,7 @@ description=A plugin that cuts a layer into pieces(tiles)
 version=0.3.3
 author=Maximilian Krambach
 email=maximilian.krambach@gmx.de
-
+about=The plugin takes input files (vector or raster) and cuts these into a fixed amount of parts or into fixed-size parts, storing them on the harddisk. There is an option to cut the tiles by predefined shapes (cutlayer). It is not thought for data preparation on pseudo-mercator tiling services, as gdal2tiles already does this job (naming, crs and file storage conventions differ). It is just for "cutting the map into handy bits and leave the map data untouched". The plugin uses GDAL/OGR if found.
 # End of mandatory metadata
 
 # Recommended items:
