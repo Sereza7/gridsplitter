@@ -294,22 +294,6 @@
       <string>Create Tile index tileindex.shp (requires gdaltindex/ogrtindex)</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="absolutePathCheck">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>210</y>
-       <width>371</width>
-       <height>18</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write the tile index information in absolute paths instead of relative to the index file's position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>write absolute path</string>
-     </property>
-    </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
@@ -396,7 +380,6 @@
     </widget>
     <zorder>layoutWidget</zorder>
     <zorder>tileindexCheck</zorder>
-    <zorder>absolutePathCheck</zorder>
     <zorder>groupBox</zorder>
    </widget>
    <widget class="QWidget" name="tab_2">
@@ -508,8 +491,7 @@ If the cut layer is in a different projection than the input file, there will be
       <item>
        <widget class="QLabel" name="label_13">
         <property name="text">
-         <string>Create Tile Index: Writes a shapefile containing the bounding boxes of all created tiles.
- The information will be written in absolute paths or relative to the shapefile</string>
+         <string>Create Tile Index: Writes a shapefile containing the bounding boxes of all created tiles.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

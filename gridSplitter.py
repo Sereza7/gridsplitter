@@ -539,19 +539,10 @@ class gridSplitter:
                 else:
                     files= glob(self.outputfolder+os.sep+"*"+os.sep+"*"+os.sep+pref+"*"+outputsuf)
             
-            if self.dlg.absolutePathCheck.isChecked():
-                for f1 in files:
-                    if layertocut.type()== QgsMapLayer.RasterLayer:
-                        self.Popenargs=[self.gdalprefix+'gdaltindex',"-write_absolute_path",'-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
-                        self.runPopen()
-                    if layertocut.type()== QgsMapLayer.VectorLayer: #slightly different args
-                        self.Popenargs=[self.gdalprefix+'ogrtindex',"-write_absolute_path",self.outputfolder+os.sep+pref+"tileindex.shp",f1]
-                        self.runPopen()
-            else:
-                for f1 in files:
-                    if layertocut.type()== QgsMapLayer.RasterLayer:
-                        self.Popenargs=[self.gdalprefix+'gdaltindex','-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
-                        self.runPopen()
+            for f1 in files:
+                if layertocut.type()== QgsMapLayer.RasterLayer:
+                    self.Popenargs=[self.gdalprefix+'gdaltindex', '-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                    self.runPopen()
                     if layertocut.type()== QgsMapLayer.VectorLayer: #slightly different args
                         self.Popenargs=[self.gdalprefix+'ogrtindex',self.outputfolder+os.sep+pref+"tileindex.shp",f1]
                         self.runPopen()
