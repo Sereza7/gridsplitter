@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo, QVariant
 from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources_rc
@@ -209,6 +209,7 @@ class gridSplitter:
         layertocutFilePath= l.split('|')[0]
         existwarning=0
         self.existerror=0
+        self.subpath = 0
                         
         if self.dlg.cutLayerRadio.isChecked(): #option: cut by Cutlayer
             if not os.path.exists(self.outputfolder):
@@ -549,6 +550,21 @@ class gridSplitter:
             layer = QgsVectorLayer(self.outputfolder+os.sep+pref+"tileindex.shp" , pref+"tileindex", "ogr")
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             
+            layer.dataProvider().addAttributes([QgsField("row", QVariant.String,"",10),QgsField("col",QVariant.String,"",10)])
+            layer.updateFields()
+            layer.startEditing()
+            for feature in layer.getFeatures():
+                withoutextension = feature['location'].split('.')[-2]
+                withoutpath = withoutextension.split(os.sep)[-1]
+                withoutprefix = withoutextension.split(self.dlg.prefixx.text())[-1]
+                feature['col'] = withoutprefix.split('_')[0]
+                try: 
+                    feature['row'] = withoutprefix.split('_')[1]
+                except IndexError:
+                    pass
+                layer.updateFeature(feature)
+            d = layer.commitChanges()
+            print d
             
     def runPopen(self):
         if os.name=="nt":
