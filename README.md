@@ -7,13 +7,13 @@ and qgis:intersection or, if found, gdal/ogr. It takes the extent of the input d
 those pieces to an output directory and subdirectories. 
 
 It aims to be functional in any coordinate reference 
-system and with any number of pieces (or tiles). It saves its outputs in .TIF and .shp, respectively.
+system and with any number (up to 9999*9999) of pieces (or tiles). It saves its outputs in .TIF and .shp, respectively.
 
 The initial plugin used the "plugin builder" from Qgis; this is my first plugin, so redundant and ugly code is to be expected.
 
 Dependencies
 =================
-It depends on QGIS and GDAL.
+It depends on QGIS and GDAL, although it runs even when those are not found.
 
 Running the plugin
 =================
@@ -22,6 +22,21 @@ The plugin needs a layer to be loaded in QGIS to process it.
 
 Changelog
 =================
+v. 0.3.5 bugfix
+
+    bug github #1: TypeError when no GDAL is found
+   
+v.0.3.4 minor additions, bugfixes
+   
+    bug 13935 openlayers blocking start of plugin
+    
+    bug 13921: UI improvement
+    
+    bug 13922: ansolute path doesn't work, removing option for now
+    
+    feature request 13923: adding col and row to the tileindex shapefile
+    
+
 v.0.3.3 minor changes
 
     translation to german
