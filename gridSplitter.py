@@ -416,7 +416,7 @@ class gridSplitter:
                                         self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
                                         self.errorlog()
                                 else: 
-                                    k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +'%04d' %(str(i))+"_"+'%04d' %(str(j))+".shp")
+                                    k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str('%04d' %(i))+"_"+ str('%04d' %(j))+".shp")
                                     del k
                                 #add to canvas
                                 if self.dlg.addTiles.isChecked()== True:
