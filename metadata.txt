@@ -19,7 +19,7 @@ about=The plugin takes input files (vector or raster) and cuts these into a fixe
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
- changelog= fixed error in runalg causing TypeError when no GDAL is found (github issue #1)
+changelog=0.3.5: fixed error in runalg causing TypeError when no GDAL is found (github issue #1)
 
 # Tags are comma separated with spaces allowed
 tags=tiles, raster, vector

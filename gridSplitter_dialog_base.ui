@@ -399,7 +399,7 @@
       <locale language="English" country="UnitedStates"/>
      </property>
      <property name="text">
-      <string>Version 0.3.4  Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
+      <string>Version 0.3.5  Please report errors to http://hub.qgis.org/projects/gridsplitter</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
