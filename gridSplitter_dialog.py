@@ -38,7 +38,9 @@ class gridSplitterDialog(QtGui.QDialog, FORM_CLASS):
         self.cmdBrowseOutput.clicked.connect(self.output_path)
      
     def output_path(self):
-       self.dirname = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+       self.dirname = str(QtGui.QFileDialog.getExistingDirectory(self, 
+                                                                 "Select 
+                                                                 Directory"))
        self.OuptDir.clear()
        self.OuptDir.setText(self.dirname)
        

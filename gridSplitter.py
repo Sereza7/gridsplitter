@@ -20,15 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo, QVariant
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, 
+from PyQt4.QtCore import QFileInfo, QVariant
 from PyQt4.QtGui import QAction, QIcon, QMessageBox
-# Initialize Qt resources from file resources.py
 import resources_rc
-# Import the code for the dialog
 from gridSplitter_dialog import gridSplitterDialog
 from qgis.core import * 
-import os, os.path, processing, math, time
-import tempfile #for temp shapefile naming
+import os, os.path, processing, math, time, tempfile, sys
 from subprocess import call, CalledProcessError, check_output, PIPE, Popen
 from glob import glob
 
@@ -42,7 +40,8 @@ class gridSplitter:
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(self.plugin_dir,'i18n','gridSplitter_{}.qm'.format(locale))
+        locale_path = os.path.join(self.plugin_dir,'i18n',
+                                   'gridSplitter_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -57,11 +56,9 @@ class gridSplitter:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&gridSplitter')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'gridSplitter')
         self.toolbar.setObjectName(u'gridSplitter')
 
-    # noinspection PyMethodMayBeStatic
     def tr(self, message):
         return QCoreApplication.translate('gridSplitter', message)
 
@@ -85,7 +82,6 @@ class gridSplitter:
 
         if status_tip is not None:
             action.setStatusTip(status_tip)
-
         if whats_this is not None:
             action.setWhatsThis(whats_this)
 
@@ -124,78 +120,75 @@ class gridSplitter:
 
 
     def checkempties(self):
-        #check if some inputs aren't valid
-        self.outputfolder = self.dlg.OuptDir.text()
+        """check if some inputs aren't valid"""
+        self.of = self.dlg.OuptDir.text()
         index = self.dlg.inputRasterBox.currentIndex()
         layertocut = self.dlg.inputRasterBox.itemData(index)
-        if layertocut!= "":
-            if self.outputfolder!="":
-                if self.dlg.cutLayerRadio.isChecked(): #check for cutlayer if this is the option
-                    index = self.dlg.cutLayerBox.currentIndex()
-                    self.cutlayer = self.dlg.cutLayerBox.itemData(index)
-                    if self.cutlayer != "": #check if cutlayer exists
-                        return "1"
-                    else: #if cutlayer does not exist
-                        QMessageBox.information(None,self.tr("No cut layer!"), self.tr("Please specify a cut layer"))
-                        return "0" 
-                else: 
-                    return "1"
-            else:
-                QMessageBox.information(None, "Grid Splitter", self.tr("Please specify output directory"))
-                return "0"
-        else:
-            QMessageBox.information(None, "Grid Splitter", self.tr("Please specify layer"))
-            return "0"
+        if layertocut== "":
+            QMessageBox.information(None, "Grid Splitter",
+                                    self.tr("Please specify layer"))
+            return 0
+        
+        if self.of=="":
+            QMessageBox.information(None, "Grid Splitter", 
+                                    self.tr("Please specify output directory"))
+                return 0
+                
+        if self.dlg.cutLayerRadio.isChecked(): 
+            index = self.dlg.cutLayerBox.currentIndex()
+            self.cutlayer = self.dlg.cutLayerBox.itemData(index)
+            if self.cutlayer == "": #check if cutlayer exists
+                QMessageBox.information(None,self.tr("No cut layer!"),
+                                        self.tr("Please specify a cut layer"))
+                        return 0 
+        return 1
+            
 
 
     def run(self):
-     #remove all old tempfiles tempdir/gridSplitter_tmpfile_* ?
-     # show the dialog
-     #loop the GUI until each required parameter is checked
      
-     chekk="0"
+     chekk=0
      #get gdal_path if windows , else just check in current path
-     if os.name=="nt":
+     if os.name=="nt" or sys.platform == "darwin":
          self.gdalprefix = QgsApplication.prefixPath()+ '/../../bin/'
      else:
         self.gdalprefix = ""
      #checking once if GDAL exists
      #TODO check with different paths, e.g QgsApplication.prefixPath()+'/bin'
      self.gdalexists= self.checkgdal()
+     
      #fill layers:
      self.dlg.cutLayerBox.clear()
      self.dlg.inputRasterBox.clear()
-     
      layers = QgsMapLayerRegistry.instance().mapLayers().values()
      for layer in layers:
          try:
-             if layer.dataProvider().description().startswith('GDAL') or layer.dataProvider().description().startswith('OGR'): 
-                if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == QGis.Polygon:
+             if layer.dataProvider().description().startswith('GDAL') or
+             layer.dataProvider().description().startswith('OGR'): 
+                if layer.type() == QgsMapLayer.VectorLayer and 
+                layer.geometryType() == 2:
                     self.dlg.cutLayerBox.addItem( layer.name(), layer ) 
                 self.dlg.inputRasterBox.addItem(layer.name(), layer)
          except AttributeError:
              pass
-     while chekk != "1": 
-        self.dlg.show() #0 Run the dialog event loop
-        result = self.dlg.exec_()
-        #if okay pressed, check for parameters
-        if result: #if okay is pressed
+         
+     result = self.dlg.exec_()
+     
+     while result: #if okay is pressed
             chekk = self.checkempties() #check parameters
-            if chekk=="1":
+            if chekk==1:
                 self.operate()
-        else:
-            chekk = "1" #end check loop and stop running
-
-        
-    
+            else:
+                result = self.dlg.exec_()
+            
     def operate(self):
         #activate logging
-        self.errorfilename= tempfile.gettempdir() + os.sep + "gridsplitter-error.log"
-        self.errorfile= os.open(self.errorfilename,os.O_APPEND|os.O_CREAT|os.O_RDWR)
-        self.logfilename= tempfile.gettempdir() + os.sep + "gridsplitter-log.log"
-        self.logfile= os.open(self.logfilename,os.O_APPEND|os.O_CREAT|os.O_RDWR)
+        self.efn= tempfile.gettempdir() + os.sep + "gridsplitter-error.log"
+        self.ef= os.open(self.efn,os.O_APPEND|os.O_CREAT|os.O_RDWR)
+        self.lfn= tempfile.gettempdir() + os.sep + "gridsplitter-log.log"
+        self.lf= os.open(self.lfn,os.O_APPEND|os.O_CREAT|os.O_RDWR)
         #get variables
-        self.outputfolder = self.dlg.OuptDir.text()
+        self.of = self.dlg.OuptDir.text()
         splicesX = int(self.dlg.splicesXSpinBox.text())
         splicesY = int(self.dlg.splicesYSpinBox.text())
         tilesizeX= float(self.dlg.tileSizeX.value())
@@ -206,102 +199,131 @@ class gridSplitter:
         self.layertocutcrs= layertocut.crs()   
         ext = layertocut.extent()
         l = layertocut.dataProvider().dataSourceUri()
-        layertocutFilePath= l.split('|')[0]
+        lyrct_fp= l.split('|')[0]
         existwarning=0
         self.existerror=0
         self.subpath = 0
                         
         if self.dlg.cutLayerRadio.isChecked(): #option: cut by Cutlayer
-            if not os.path.exists(self.outputfolder):
-                os.makedirs(self.outputfolder)
+            if not os.path.exists(self.of):
+                os.makedirs(self.of)
             self.amount=self.cutlayer.featureCount()
             goon= self.warn()
-            if goon == True:
+            if goon == False:
+                return
+            else:
                 if self.layertocutcrs != self.cutlayer.crs():
                     self.reprojectTempFile()
                 else:
                     self.epsg=self.layertocutcrs.toProj4()
                 #do iterations over every feature
                 iter = self.cutlayer.getFeatures() 
-                
                 for feature in iter:
                     i= feature.id()
                     if feature.geometry().intersects(ext):
                         self.poly = feature
-                        self.temppolygon() #make temporary file
+                        self.temppolygon() 
                         if self.dlg.subfolderRadio.isChecked():
-                            folder= self.outputfolder + os.sep + str('%04d' %(i))+ os.sep
+                            folder= self.of + os.sep + str('%04d' %(i))+ os.sep
                             if not os.path.exists(folder):
-                                os.makedirs(folder) #make output folder
+                                os.makedirs(folder)
                                 self.subpath=1
                         if self.dlg.nosubfolderRadio.isChecked():
-                            folder = self.outputfolder+os.sep
+                            folder = self.of+os.sep
                             self.subpath=0
+                            
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            nodata = layertocut.dataProvider().srcNoDataValue(1) #what about multiband rasters?
+                            nodata = layertocut.dataProvider().srcNoDataValue(1)
+                            #TODO nadata values for other bands different?
                             self.epsg=self.layertocutcrs.toProj4()
                             newfile = folder+pref+str('%04d' %(i))+".tif"
-                            if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                            if os.path.isfile(newfile): 
                                 if existwarning == 0:
                                     existwarning = self.exists()
                             if self.gdalexists==True:
-                                self.Popenargs=[self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-wo","CUTLINE_ALL_TOUCHED=TRUE","-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile]
-                              
+                                self.Popenargs=[self.gdalprefix+"gdalwarp",
+                                                "-q",
+                                                "-s_srs", self.epsg, 
+                                                "-t_srs", self.epsg, 
+                                                "-wo","CUTLINE_ALL_TOUCHED=TRUE",
+                                                "-crop_to_cutline",
+                                                "-srcnodata", (nodata),
+                                                "-dstnodata",str(nodata),
+                                                "-cutline",self.temp,lyrct_fp,
+                                                newfile]
                                 errx= self.runPopen()
                                 if errx==1:
-                                    self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
+                                    self.errmsg = "this error was created by "
+                                    +"gdalwarp at " 
+                                    + time.strftime('%X %x %Z')
                                     self.errorlog()
                             else:
-                                k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp,nodata, False, False,"-wo CUTLINE_ALL_TOUCHED=TRUE", folder +pref + str('%04d' %(i))+ ".tif")
+                                k= processing.runalg('gdalogr:cliprasterbymasklayer',
+                                                     layertocut, 
+                                                     self.temp,nodata, 
+                                                     False, 
+                                                     False,
+                                                     "-wo CUTLINE_ALL_TOUCHED=TRUE", 
+                                                     folder +pref + str('%04d' %(i))+ ".tif")
                                 del k
-                            if self.dlg.addTiles.isChecked()== True:  
+                            if self.dlg.addTiles.isChecked()== True:
                                 #add raster layer to canvas
                                 fileInfo = QFileInfo(folder +pref + str('%04d' %(i))+".tif")
                                 baseName = fileInfo.baseName()
-                                layer = QgsRasterLayer(folder +pref + str('%04d' %(i))+".tif", baseName)
+                                layer = QgsRasterLayer(folder +pref + str('%04d' %(i))+".tif", 
+                                                       baseName)
                                 QgsMapLayerRegistry.instance().addMapLayer(layer)
                         
                         else: #run for vector layer
                             if layertocut.type()== QgsMapLayer.VectorLayer:
                                 
                                 newfile=folder+ pref +str('%04d' %(i))+".shp"
-                                if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                if os.path.isfile(newfile):
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.gdalexists ==True:
-                                    self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc" ,self.temp, newfile, layertocutFilePath]
+                                    self.Popenargs=[self.gdalprefix+"ogr2ogr",
+                                                    "-t_srs",self.epsg,
+                                                    "-s_srs",self.epsg,
+                                                    "-clipsrc" ,self.temp, 
+                                                    newfile, 
+                                                    lyrct_fp]
                                     errx=self.runPopen()
                                     if errx==1:
-                                        self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
+                                        self.errmsg = "this error was created" 
+                                        +" by ogr2ogr at " 
+                                        + time.strftime('%X %x %Z')
                                         self.errorlog() 
                                 else:
-                                    k= processing.runalg('qgis:intersection', layertocut, self.gridtmp , folder+ pref +str('%04d' %(i))+".shp")
+                                    k= processing.runalg('qgis:intersection', 
+                                                         layertocut, 
+                                                         self.gridtmp , 
+                                                         folder+ pref +str('%04d' %(i))+".shp")
                                     del k
                                 if self.dlg.addTiles.isChecked()== True:
-                                    layer = QgsVectorLayer(folder+ pref +str('%04d' %(i))+".shp" , pref + str('%04d' %(i)), "ogr")
+                                    layer = QgsVectorLayer(
+                                        folder+ pref +str('%04d' %(i))+".shp" ,
+                                        pref + str('%04d' %(i)), "ogr")
                                     QgsMapLayerRegistry.instance().addMapLayer(layer)
                     
-                        self.cleanup()#clean up tempfile
+                        self.cleanup()
                 self.tileindex()
-            else: #goon == false
-                pass
+            
         else: #option:cut by tile
-            if not os.path.exists(self.outputfolder):
-                os.makedirs(self.outputfolder) #make output base directory
+            if not os.path.exists(self.of):
+                os.makedirs(self.of) 
             self.epsg=self.layertocutcrs.toProj4()
             xmax = float(layertocut.extent().xMaximum())
             xmin = float(layertocut.extent().xMinimum())
             ymax = float(layertocut.extent().yMaximum())
             ymin = float(layertocut.extent().yMinimum())
-            if layertocut.type()== QgsMapLayer.RasterLayer: #option cutbytile, raster layer
-                 #if raster layer, get extents and calculate so it doesn't cut pixels. 
-                 #Make the tiles up to one pixel larger if they cut
+            if layertocut.type()== QgsMapLayer.RasterLayer: 
+                #option cutbytile, raster layer
                 rwidth = float(layertocut.width())
                 rheight = float(layertocut.height())
-                xres = (xmax-xmin)/rwidth #WMS layer fails here: ZeroDivisionError: float division by zero
+                xres = (xmax-xmin)/rwidth 
                 yres = (ymax-ymin)/rheight
-                #if tile number is given
                 if self.dlg.numberTilesRadio.isChecked():
                     ixx= float(rwidth)/splicesX
                     iyy= float(rheight)/splicesY
@@ -327,59 +349,90 @@ class gridSplitter:
                             xsplmax= xmin + (i+1)*xsplice
                             ysplmin= ymin + j*ysplice
                             ysplmax = ymin + (j+1)*ysplice
-                            pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
+                            pol= "POLYGON (("+str(xsplmin)
+                            +" "+str(ysplmin)+", "+str(xsplmax)+" "
+                            +str(ysplmin)+", "+str(xsplmax)+" "
+                            +str(ysplmax)+", "+str(xsplmin)+" "
+                            +str(ysplmax)+", "+str(xsplmin)+" 
+                            "+str(ysplmin)+ "))"
+                            
                             self.poly = QgsFeature()
                             self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                             self.temppolygon()
                             
                             if self.dlg.subfolderRadio.isChecked():
-                                folder= self.outputfolder + os.sep + str('%04d' %(i))+os.sep + str('%04d' %(j))+ os.sep 
-                                if not os.path.exists(folder): #create folders
+                                folder= self.of + os.sep 
+                                + str('%04d' %(i))+os.sep 
+                                + str('%04d' %(j))+ os.sep 
+                                if not os.path.exists(folder): 
                                     os.makedirs(folder)
                                 self.subpath=2
                             if self.dlg.nosubfolderRadio.isChecked():
-                                folder = self.outputfolder+os.sep
+                                folder = self.of+os.sep
                                 self.subpath=0
-                            nodata = layertocut.dataProvider().srcNoDataValue(1) #what about multiband rasters?
-                            newfile = folder+pref+str('%04d' %(i))+"_"+str('%04d' %(j))+".tif"
-                            if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                            nodata = layertocut.dataProvider().srcNoDataValue(1)
+                            newfile = folder
+                            +pref
+                            +str('%04d' %(i))+"_"+str('%04d' %(j))+".tif"
+                            if os.path.isfile(newfile):
                                 if existwarning == 0:
                                     existwarning = self.exists()
-                            
                             if self.gdalexists ==True:
-                                self.Popenargs=[self.gdalprefix+"gdalwarp","-q","-s_srs",self.epsg, "-t_srs",self.epsg, "-crop_to_cutline","-srcnodata",str(nodata),"-dstnodata",str(nodata),"-cutline",self.temp,layertocutFilePath,newfile]
+                                self.Popenargs=[self.gdalprefix+"gdalwarp",
+                                                "-q",
+                                                "-s_srs",self.epsg, 
+                                                "-t_srs",self.epsg, 
+                                                "-crop_to_cutline",
+                                                "-srcnodata",str(nodata),
+                                                "-dstnodata",str(nodata),
+                                                "-cutline",self.temp,
+                                                lyrct_fp,newfile]
                                 errx=self.runPopen()
                                 if errx==1:
-                                    self.errmsg = "this error was created by gdalwarp at " + time.strftime('%X %x %Z')
+                                    self.errmsg = "this error was created by "
+                                    +"gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
                             else:
-                                k= processing.runalg('gdalogr:cliprasterbymasklayer', layertocut, self.temp , nodata, False, False, "",folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif")
+                                k= processing.runalg('gdalogr:cliprasterbymasklayer', 
+                                                     layertocut, 
+                                                     self.temp , 
+                                                     nodata, 
+                                                     False, 
+                                                     False, 
+                                                     "",
+                                                     folder +pref 
+                                                     + str('%04d' %(i))
+                                                     +"_"+str('%04d' %(j))+".tif")
                                 del k
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
-                                fileInfo = QFileInfo(folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif")
+                                fileInfo = QFileInfo(folder 
+                                                     +pref 
+                                                     + str('%04d' %(i))
+                                                     +"_"+str('%04d' %(j))+".tif")
                                 baseName = fileInfo.baseName()
-                                layer = QgsRasterLayer(folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif", baseName)
+                                layer = QgsRasterLayer(folder +pref 
+                                                       + str('%04d' %(i))+"_"
+                                                       +str('%04d' %(j))+".tif", 
+                                                       baseName)
                                 QgsMapLayerRegistry.instance().addMapLayer(layer)
-                                
-                            #clean up
+                            
                             self.cleanup()
                     self.tileindex()
-                else: #goon == false
-                    pass
-                    
             else: #option cut by tile, vector layer
                 if layertocut.type()== QgsMapLayer.VectorLayer:
                     
-                    if self.dlg.numberTilesRadio.isChecked():#if tile number is given
+                    if self.dlg.numberTilesRadio.isChecked():
                         xsplice = (xmax - xmin)/splicesX
                         ysplice = (ymax - ymin)/splicesY
                     else: #if tile size is given
                         if self.dlg.tileSizeRadio.isChecked():
                             xsplice = tilesizeX
                             ysplice = tilesizeY
-                            splicesX = int(math.ceil((xmax-xmin)/float(tilesizeX)))
-                            splicesY = int(math.ceil((ymax-ymin)/float(tilesizeY)))
+                            splicesX = int(math.ceil((xmax-xmin)/
+                                                     float(tilesizeX)))
+                            splicesY = int(math.ceil((ymax-ymin)/
+                                                     float(tilesizeY)))
                     
                     self.amount = splicesX*splicesY
                     goon = self.warn()
@@ -387,126 +440,166 @@ class gridSplitter:
                         #iterate
                         for i in range(splicesX):
                             for j in range(splicesY):
-                                #make a temporary polygon
                                 xsplmin= xmin + i*xsplice
                                 xsplmax= xmin + (i+1)*xsplice
                                 ysplmin= ymin + j*ysplice
                                 ysplmax = ymin + (j+1)*ysplice
-                                pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
+                                pol= "POLYGON (("+str(xsplmin)+" "
+                                +str(ysplmin)+", "+str(xsplmax)+" "
+                                +str(ysplmin)+", "+str(xsplmax)+" "
+                                +str(ysplmax)+", "+str(xsplmin)+" "
+                                +str(ysplmax)+", "+str(xsplmin)+" "
+                                +str(ysplmin)+ "))"
                                 self.poly = QgsFeature()
                                 self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                                 self.temppolygon()
                                 
                                 if self.dlg.subfolderRadio.isChecked():
-                                    folder= self.outputfolder + os.sep + str('%04d' %(i))+os.sep + str('%04d' %(j))+ os.sep
+                                    folder= self.of + os.sep 
+                                    + str('%04d' %(i))+os.sep 
+                                    + str('%04d' %(j))+ os.sep
                                     if not os.path.exists(folder):
                                         os.makedirs(folder) #make folders
                                     self.subpath=2
                                 if self.dlg.nosubfolderRadio.isChecked():
-                                    folder= self.outputfolder+os.sep
+                                    folder= self.of+os.sep
                                     self.subpath=0
-                                newfile = folder+ pref +str('%04d' %(i))+"_"+str('%04d' %(j))+".shp"
-                                if os.path.isfile(newfile): #warn if file exists. But only warn once in big runs
+                                newfile = folder+ pref +str('%04d' %(i))
+                                +"_"+str('%04d' %(j))+".shp"
+                                if os.path.isfile(newfile):
                                     if existwarning == 0:
                                         existwarning = self.exists()
                                 if self.gdalexists==True:
-                                    self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",self.epsg,"-clipsrc",self.temp, newfile, layertocutFilePath]
+                                    self.Popenargs=[self.gdalprefix+"ogr2ogr",
+                                                    "-t_srs",self.epsg,
+                                                    "-s_srs",self.epsg,
+                                                    "-clipsrc",self.temp, 
+                                                    newfile, lyrct_fp]
                                     errx=self.runPopen()
                                     if errx==1:
-                                        self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
+                                        self.errmsg = "this error was created"
+                                        + "by ogr2ogr at " 
+                                        + time.strftime('%X %x %Z')
                                         self.errorlog()
                                 else: 
-                                    k= processing.runalg('qgis:intersection', layertocut, self.temp , folder+ pref +str('%04d' %(i))+"_"+ str('%04d' %(j))+".shp")
+                                    k= processing.runalg('qgis:intersection', 
+                                                         layertocut, 
+                                                         self.temp , 
+                                                         folder+ pref 
+                                                         +str('%04d' %(i))
+                                                         +"_"+ str('%04d' %(j))
+                                                         +".shp")
                                     del k
-                                #add to canvas
                                 if self.dlg.addTiles.isChecked()== True:
-                                    layer = QgsVectorLayer(folder+ pref +str('%04d' %(i))+"_"+str('%04d' %(j))+".shp" , pref +str('%04d' %(i))+"_"+str('%04d' %(j)), "ogr")
+                                    layer = QgsVectorLayer(folder
+                                                           + pref 
+                                                           +str('%04d' %(i))+"_"
+                                                           +str('%04d' %(j))
+                                                           +".shp", 
+                                                           pref 
+                                                           +str('%04d' %(i))+"_"
+                                                           +str('%04d' %(j)), 
+                                                           "ogr")
                                     QgsMapLayerRegistry.instance().addMapLayer(layer)
-                                
-                                #clean up
                                 self.cleanup()
                         self.tileindex()
-                    else:
-                        pass
-                        
-        os.close(self.errorfile)
-        os.close(self.logfile)
+        os.close(self.ef)
+        os.close(self.lf)
         
         
     def cleanup(self):
-        QgsMapLayerRegistry.instance().removeMapLayers( [self.gridtmp.id()] )
-        #close self.temp if it's open still
-        if os.path.isfile(self.temp): #does not work on win7. runalg keeps them open
+        #does not work on win7. runalg keeps them open
+        if os.path.isfile(self.temp): 
             QgsVectorFileWriter.deleteShapeFile(self.temp)
         cpg = self.temp[:-4]+ ".cpg"
         if os.path.isfile(cpg):
             os.remove(cpg)
             
     def temppolygon(self):
-       #stop the annoying asks with user-defined CRS
         self.epsg = self.layertocutcrs.toWkt()
         tmpf= "Polygon?crs="+ self.epsg
         self.gridtmp = QgsVectorLayer(tmpf, "gridtile", "memory")
-        QgsMapLayerRegistry.instance().addMapLayer(self.gridtmp)
         self.gridtmp.startEditing()
         fet = QgsFeature()
         pr= self.gridtmp.dataProvider()
         fet.setGeometry(self.poly.geometry())
         pr.addFeatures( [ fet ] )
         self.gridtmp.commitChanges()
-        #create tempfile, write stuff in it
-        #get a temp file name. Process should be less ugly
-        tmpc, self.temp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_tmpfile_')
+        tmpc, self.temp = tempfile.mkstemp(suffix='.shp', 
+                                           prefix='gridSplitter_tmpfile_')
         os.close(tmpc)
         os.remove(self.temp)
-        writer = QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, self.temp,"utf-8",self.layertocutcrs,"ESRI Shapefile")
-        #close tempfile
+        writer = QgsVectorFileWriter.writeAsVectorFormat(self.gridtmp, 
+                                                         self.temp,
+                                                         "utf-8",
+                                                         self.layertocutcrs,
+                                                         "ESRI Shapefile")
         del writer
         
-        
     def warn(self):
-        message= self.tr("you are about to make up to ") + str(self.amount) + self.tr(" tiles. Continue?")
-        k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.Abort)
+        message= self.tr("you are about to make up to ") 
+        + str(self.amount) + self.tr(" tiles. Continue?")
+        k = QMessageBox .question(None, "Grid Splitter", 
+                                  message, 
+                                  QMessageBox.Yes, 
+                                  QMessageBox.Abort)
         if k == QMessageBox.Yes:
             return True
         else:
             return False
 
     def reprojectTempFile(self):
-        #reproject cutlayer into temporary memory layer
-        message= self.tr("The Cutlayer doesn't match the projection of the layer to be cut. Should I try to reproject (temporary file)?")
-        k = QMessageBox .question(None, "Grid Splitter", message, QMessageBox.Yes, QMessageBox.No)
+        message= self.tr("The Cutlayer doesn't match the projection of the"
+                         +"layer to be cut. Should I try to reproject"
+                         + "(temporary file)?")
+        k = QMessageBox .question(None, 
+                                  "Grid Splitter", 
+                                  message, 
+                                  QMessageBox.Yes, 
+                                  QMessageBox.No)
         if k == QMessageBox.Yes:
             self.epsg = self.layertocutcrs.toProj4()
             cutlayersrs= self.cutlayer.crs()
             srcsrs = cutlayersrs.toProj4()
-            #reproject TODO with ogr2ogr
-            tmpc, tmp = tempfile.mkstemp(suffix='.shp', prefix='gridSplitter_reprojectedlayer_')
+            tmpc, tmp = tempfile.mkstemp(suffix='.shp', 
+                                         prefix='gridSplitter_reprojectedlayer_')
             os.close(tmpc)
             os.remove(tmp)
             c = self.cutlayer.dataProvider().dataSourceUri()
             cutlayername= c.split('|')[0]
             if self.gdalexists==True:
-                self.Popenargs=[self.gdalprefix+"ogr2ogr","-t_srs",self.epsg,"-s_srs",srcsrs, tmp, cutlayername]
+                self.Popenargs=[self.gdalprefix+"ogr2ogr",
+                                "-t_srs",self.epsg,
+                                "-s_srs",srcsrs, 
+                                tmp, cutlayername]
                 errx=self.runPopen()
-                self.cutlayer = QgsVectorLayer(tmp,"reprojected Cutlayer","ogr")
+                self.cutlayer = QgsVectorLayer(tmp,
+                                               "reprojected Cutlayer",
+                                               "ogr")
                 if errx==1:
-                    self.errmsg = "this error was created by ogr2ogr at " + time.strftime('%X %x %Z')
+                    self.errmsg = "this error was created by ogr2ogr at " 
+                    + time.strftime('%X %x %Z')
                     self.errorlog()
             else:
-                new= processing.runalg('qgis:reprojectlayer', self.cutlayer, self.epsg, None)
-                self.cutlayer = QgsVectorLayer(new.get("OUTPUT"),"reprojected Cutlayer","ogr")
+                new= processing.runalg('qgis:reprojectlayer', 
+                                       self.cutlayer, 
+                                       self.epsg, 
+                                       None)
+                self.cutlayer = QgsVectorLayer(new.get("OUTPUT"),
+                                               "reprojected Cutlayer",
+                                               "ogr")
                 del new
             QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
-        else: #don't reproject
-            pass
 
     def exists(self):
-      QMessageBox.information(None, self.tr("File exists"), self.tr("Some output files already exist. gridSplitter does not overwrite files, so results may be unexpected"))
+      QMessageBox.information(None, self.tr("File exists"), 
+                              self.tr("Some output files already exist."
+                                  +"gridSplitter does not overwrite files,"
+                                  +" so results may be unexpected"))
       return 1
       
     def checkgdal(self):
-    #check if GDALWARP is in the %Path. Assuming, ogr2ogr is there, too
+    """checks if GDALWARP is in the %Path. Assuming, ogr2ogr is there, too"""
         try: 
             call(self.gdalprefix+'gdalwarp')
         except OSError:
@@ -516,15 +609,17 @@ class gridSplitter:
 
     def errorlog(self):
         if self.existerror == 0:
-            QMessageBox.information(None, "Grid Splitter", self.tr("There was an error executing. See log for additional details"))
+            QMessageBox.information(None, "Grid Splitter", 
+                                    self.tr("There was an error executing."
+                                        +" See log for additional details"))
             self.existerror = 1
         errormessage= self.errmsg + os.linesep
-        os.write(self.errorfile, errormessage)
+        os.write(self.ef, errormessage)
     
     def tileindex(self):
         if self.dlg.tileindexCheck.isChecked():
             pref= self.dlg.prefixx.text()
-            path=self.outputfolder
+            path=self.of
             index = self.dlg.inputRasterBox.currentIndex()
             layertocut = self.dlg.inputRasterBox.itemData(index)
             self.epsg=layertocut.crs().toProj4()
@@ -533,24 +628,32 @@ class gridSplitter:
             if layertocut.type()== QgsMapLayer.VectorLayer:
                 outputsuf= ".shp"
             if self.subpath==0:
-                files= glob(self.outputfolder+os.sep+pref+"*"+outputsuf)
+                files= glob(self.of+os.sep+pref+"*"+outputsuf)
             else:
                 if self.subpath==1:
-                    files= glob(self.outputfolder+os.sep+"*"+os.sep+pref+"*"+outputsuf)
+                    files= glob(self.of+os.sep+"*"+os.sep+pref+"*"+outputsuf)
                 else:
-                    files= glob(self.outputfolder+os.sep+"*"+os.sep+"*"+os.sep+pref+"*"+outputsuf)
+                    files= glob(self.of+os.sep+"*"+os.sep+"*"
+                                +os.sep+pref+"*"+outputsuf)
             
             for f1 in files:
                 if layertocut.type()== QgsMapLayer.RasterLayer:
-                    self.Popenargs=[self.gdalprefix+'gdaltindex', '-t_srs',self.epsg,self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                    self.Popenargs=[self.gdalprefix+'gdaltindex', 
+                                    '-t_srs',self.epsg,
+                                    self.of+os.sep+pref+"tileindex.shp",
+                                    f1]
                     self.runPopen()
-                    if layertocut.type()== QgsMapLayer.VectorLayer: #slightly different args
-                        self.Popenargs=[self.gdalprefix+'ogrtindex',self.outputfolder+os.sep+pref+"tileindex.shp",f1]
+                    if layertocut.type()== QgsMapLayer.VectorLayer: 
+                        self.Popenargs=[self.gdalprefix+'ogrtindex',
+                                        self.of+os.sep+pref+"tileindex.shp",
+                                        f1]
                         self.runPopen()
-            layer = QgsVectorLayer(self.outputfolder+os.sep+pref+"tileindex.shp" , pref+"tileindex", "ogr")
+            layer = QgsVectorLayer(self.of+os.sep+pref+"tileindex.shp" ,
+                                   pref+"tileindex", "ogr")
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             
-            layer.dataProvider().addAttributes([QgsField("row", QVariant.String,"",10),QgsField("col",QVariant.String,"",10)])
+            layer.dataProvider().addAttributes([QgsField("row", QVariant.String,"",10),
+                                                QgsField("col",QVariant.String,"",10)])
             layer.updateFields()
             layer.startEditing()
             for feature in layer.getFeatures():
@@ -568,9 +671,16 @@ class gridSplitter:
             
     def runPopen(self):
         if os.name=="nt":
-            p=Popen(self.Popenargs,stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile, creationflags=0x08000000)
+            p=Popen(self.Popenargs,
+                    stdin=PIPE, 
+                    stdout=self.lf,  
+                    stderr=self.ef, 
+                    creationflags=0x08000000)
             e=p.wait()
         else:
-            p=Popen(self.Popenargs, stdin=PIPE, stdout=self.logfile,  stderr=self.errorfile)
+            p=Popen(self.Popenargs, 
+                    stdin=PIPE, 
+                    stdout=self.lf,  
+                    stderr=self.ef)
             e=p.wait()
         return e
