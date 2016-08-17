@@ -5,33 +5,65 @@ Welcome to gridSplitter's documentation!
 Concept
 =================
 
-The gridSplitter is written to cleanly cut input features. It is a wrapper for either gdalogr/cliprasterbymasklayer
-and qgis:intersection  or, if found, gdalwarp/ogr2ogr.
+The gridSplitter is written to cleanly cut input features. It is a wrapper for
+either gdalogr/cliprasterbymasklayer and qgis:intersection or, if found, 
+gdalwarp/ogr2ogr.
 
 It has several options:
 
-The first option, cut by tile number (v.0.1), takes the extent of the input data, divides it by a number of 
-pieces and saves those pieces to an output directory and subdirectories. 
-It checks for gaps and makes the tiles a tiny bit (up to one pixel inpput resolution) bigger if needed.
+The first option, cut by tile number, takes the extent of the input 
+data, divides it by a number of pieces and saves those pieces to an output 
+directory and subdirectories. It checks for gaps and makes the tiles a tiny 
+bit (up to one pixel inpput resolution) bigger if needed.
 
-The second option, (v.0.3) cut by tile size, takes as user input the tile size in input map units and determines the 
-number of tiles needed, saving those into subdirectories.
-It checks for gaps and makes the tiles a tiny bit (up to one pixel input resolution) bigger 
-So, if size given is a multiplier of "5m" and a pixel resolution of 5.1 m is given, the tile will be a multiplier of 5.1m.
+The second option, cut by tile size, takes as user input the tile 
+size in input map units and determines the number of tiles needed, saving
+those into subdirectories. It checks for gaps and makes the tiles a tiny 
+bit (up to one pixel input resolution) bigger So, if size given is a 
+multiplier of "5m" and a pixel resolution of 5.1 m is given, the tile will 
+be a multiplier of 5.1m.
 
-The third option (v.0.3) takes a cut layer and cuts a piece for ecery feature in the cut layer. This option does not 
-check for overlaps.
+The third option takes a cut layer and cuts a piece for ecery
+feature in the cut layer. This option does not check for overlaps.
 
-It aims to be functional in any coordinate reference system. It also takes User-defined CRS (v.0.3.2).
+It aims to be functional in any coordinate reference system. It also takes 
+User-defined CRS.
 
 It saves its outputs in .TIF and .shp, respectively.
 
 Running the plugin
 =================
-The plugin needs a layer to be loaded in QGIS to process it. It then loops until all input parameters are set, 
-and then warns the user of the amount of cutting upcoming (v.0.3,2). 
+The plugin needs a layer to be loaded in QGIS to process it. It then checks
+if all input parameters are set, and then warns the user of the amount of 
+cutting upcoming. 
 
-If desired, the newly created tiles will be added to QGIS, if not, they'll just be stored on hard disk.
+If desired, the newly created tiles will be added to QGIS, if not, they will
+just be stored on hard disk.
+
+**New: Running the plugin as batch job**
+=================
+After a cleanup, the cutting now can be invoked from anywhere inside QGIS
+(e.g. a python script or another plugin). You need to import the module
+and provide the following config variables:
+
+module.outputfolder # string required: The base folder where the data is to be stored
+module.layertocut # maplayer required: A loaded layer to be cut.
+
+#one of the following set to True: 
+module.cutlayeris # bool cut the layertocut by another layer 
+module.numbertilesis # bool cut the layertocut by amount of tiles
+module.tilesizeis # bool cut the layertocut by size
+
+module.cutlayer # maplayer required for cutlayeris
+module.splicesX # int required for numbertilesis, default: 1
+module.splicesY # int required for numbertilesis, default: 1
+module.tilesizeX # float required for tilesizeis, default: 1.0
+module.tilesizeY # float required for tilesizeis, default: 1.0
+module.pref # string optional prefix for the naming of output files
+module.subfolderis # bool optional. If true, there will be subfolders
+module.addtiles # bool optional. If true, all output is opened in QGIS
+module.tileindexis # bool optional. If true, a tile index will be created
+module.reproj_temp # bool optional If true, files will be reprojected as needed
 
 Required Parameters
 ...................
@@ -79,4 +111,3 @@ They close the file after using properly, so  temp files can be deleted
 It supports more input data (e.g. georeferenced jpg)
 possibility to change things later on (cblend, nodata value, ...)
 using one less layer of things should speed it up a bit.
-

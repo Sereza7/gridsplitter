@@ -10,16 +10,22 @@
 name=gridSplitter
 qgisMinimumVersion=2.0
 description=A plugin that cuts a layer into pieces(tiles)
-version=0.3.5
+version=0.3.6
 author=Maximilian Krambach
 email=maximilian.krambach@gmx.de
-about=The plugin takes input files (vector or raster) and cuts these into a fixed amount of parts or into fixed-size parts, storing them on the harddisk. There is an option to cut the tiles by predefined shapes (cutlayer). It is not thought for data preparation on pseudo-mercator tiling services, as gdal2tiles already does this job (naming, crs and file storage conventions differ). It is just for "cutting the map into handy bits and leave the map data untouched". The plugin uses GDAL/OGR if found.
+about=The plugin takes input files (vector or raster) and cuts these into 
+a fixed amount of parts or into fixed-size parts, storing them on the 
+harddisk. There is an option to cut the tiles by predefined shapes 
+(cutlayer). It is not thought for data preparation on pseudo-mercator tiling
+services, as gdal2tiles already does this job (naming, crs and file storage
+conventions differ). It is just for "cutting the map into handy bits and 
+leave the map data untouched". The plugin uses GDAL/OGR if found.
 # End of mandatory metadata
 
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=0.3.5: fixed error in runalg causing TypeError when no GDAL is found (github issue #1)
+changelog=0.3.6: code rewrite, added the option to access per batch
 
 # Tags are comma separated with spaces allowed
 tags=tiles, raster, vector
@@ -34,4 +40,3 @@ experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
