@@ -22,31 +22,30 @@
 """
 
 import os
-from PyQt4 import QtCore, QtGui, uic
-from qgis.gui import *
+from PyQt4 import QtGui, uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'gridSplitter_dialog_base.ui'))
+
 
 class gridSplitterDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         super(gridSplitterDialog, self).__init__(parent)
         self.setupUi(self)
-        
+
         self.button_box.accepted.connect(self.run)
         self.button_box.rejected.connect(self.close)
         self.cmdBrowseOutput.clicked.connect(self.output_path)
-     
+
     def output_path(self):
-       self.dirname = str(QtGui.QFileDialog.getExistingDirectory(self, 
-                                                                 "Select 
-                                                                 Directory"))
-       self.OuptDir.clear()
-       self.OuptDir.setText(self.dirname)
-       
+        self.dirname = str(
+            QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.OuptDir.clear()
+        self.OuptDir.setText(self.dirname)
+
     def run(self):
         pass
         return
-    
+
     def close(self):
         pass

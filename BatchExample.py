@@ -2,7 +2,7 @@
 """
 /***************************************************************************
  gridSplitter
- Example code for plugin usage outside the GUI, but called from python 
+ Example code for plugin usage outside the GUI, but called from python
  console.
  ***************************************************************************/
 
@@ -21,7 +21,7 @@ import imp
 
 iface = qgis.utils.iface
 module = imp.load_source('gridSplitter',
-                  '/path/to/python/plugins/gridSplitter/')
+                         '/path/to/python/plugins/gridSplitter/')
 
 mySplitter = module.gridSplitter.gridSplitter(iface)
 
@@ -31,9 +31,10 @@ module.outputfolder = '/path/to/output/'
 module.layertocut = QgsVectorLayer('/path/to/file.shp', 'input', 'ogr')
 
 module.cutlayeris = True
-module.cutlayer = QgsVectorLayer('/path/to/otherfile.shp', 'scissor layer', 'ogr')
+module.cutlayer = QgsVectorLayer('/path/to/otherfile.shp',
+                                 'scissor layer', 'ogr')
 
 module.pref = 'cut_'
 module.tileindexis = True
 
-module.operate() #runs without GUI
+module.operate()  # runs without GUI
