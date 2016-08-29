@@ -1,3 +1,4 @@
+-436
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
@@ -139,9 +140,7 @@ class gridSplitter:
             self.outputfolder = self.dlg.OuptDir.text()
         except NameError:
             pass
-        print(self.outputfolder)
         self.outputfolder = self.sanitize(self.outputfolder)
-        print(self.outputfolder)
         if not os.access(self.outputfolder, os.W_OK):
             if self.outputfolder != "":
                 if os.path.exists(self.outputfolder) is False:
@@ -176,7 +175,6 @@ class gridSplitter:
             try:
                 index = self.dlg.cutLayerBox.currentIndex()
                 self.cutlayer = self.dlg.cutLayerBox.itemData(index)
-                print (self.cutlayer)
             except NameError:
                 pass
             if self.cutlayer == "":
@@ -279,6 +277,7 @@ class gridSplitter:
             self.gdalprefix = ""
         try:
             call(self.gdalprefix+"gdalwarp")
+            # TODO: prints an error message to stdout, which can be confusing
         except OSError:
             self.gdalexists = False
         else:
@@ -323,7 +322,6 @@ class gridSplitter:
         existwarning = False
         self.existerror = False
         self.subpath = 0
-        print("Start of operation")
 
         # option: cut by Cutlayer
         if self.cutlayeris is True:
@@ -436,7 +434,7 @@ class gridSplitter:
                                                   "ogr"))
                                     QgsMapLayerRegistry.instance().\
                                         addMapLayer(layer)
-                    self.cleanup()
+                self.cleanup()
             self.tileindex()
 
         # option: cut by Tile
@@ -486,18 +484,19 @@ class gridSplitter:
                         xsplmax = xmin + (i + 1) * xsplice
                         ysplmin = ymin + j * ysplice
                         ysplmax = ymin + (j + 1) * ysplice
-                        pol = "POLYGON ((" + str(xsplmin) + " " + str(ysplmin)
-                        + ", " + str(xsplmax) + " " + str(ysplmin) + ", "
-                        + str(xsplmax) + " " + str(ysplmax) + ", "
-                        + str(xsplmin) + " " + str(ysplmax) + ", "
-                        + str(xsplmin) + " " + str(ysplmin) + "))"
+                        pol = ("POLYGON ((" + str(xsplmin) + " " +
+                               str(ysplmin) + ", " + str(xsplmax) + " " +
+                               str(ysplmin) + ", " + str(xsplmax) + " " +
+                               str(ysplmax) + ", " + str(xsplmin) + " " +
+                               str(ysplmax) + ", " + str(xsplmin) + " " +
+                               str(ysplmin) + "))")
                         self.poly = QgsFeature()
                         self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                         self.temppolygon()
                         if self.subfolderis is True:
-                            folder = self.outputfolder + os.sep
-                            + str('%04d' % (i)) + os.sep
-                            + str('%04d' % (j)) + os.sep
+                            folder = (self.outputfolder + os.sep +
+                                      str('%04d' % (i)) + os.sep +
+                                      str('%04d' % (j)) + os.sep)
                             if not os.path.exists(folder):
                                 os.makedirs(folder)
                             self.subpath = 2
@@ -506,8 +505,8 @@ class gridSplitter:
                             self.subpath = 0
                         nodata = self.layertocut.dataProvider().\
                             srcNoDataValue(1)
-                        newfile = folder + self.pref + str('%04d' % (i))
-                        + "_" + str('%04d' % (j)) + ".tif"
+                        newfile = (folder + self.pref + str('%04d' % (i)) +
+                                   "_" + str('%04d' % (j)) + ".tif")
                         if os.path.isfile(newfile):
                             if existwarning is False:
                                 existwarning = self.exists()
@@ -537,7 +536,7 @@ class gridSplitter:
                             baseName = fileInfo.baseName()
                             layer = QgsRasterLayer(newfile, baseName)
                             QgsMapLayerRegistry.instance().addMapLayer(layer)
-                self.cleanup()
+                        self.cleanup()
                 self.tileindex()
             # option cut by tile, vector layer
             else:
@@ -562,12 +561,12 @@ class gridSplitter:
                             xsplmax = xmin + (i + 1) * xsplice
                             ysplmin = ymin + j * ysplice
                             ysplmax = ymin + (j + 1) * ysplice
-                            pol = "POLYGON ((" + str(xsplmin) + " "
-                            + str(ysplmin) + ", " + str(xsplmax) + " "
-                            + str(ysplmin) + ", " + str(xsplmax) + " "
-                            + str(ysplmax) + ", " + str(xsplmin) + " "
-                            + str(ysplmax) + ", " + str(xsplmin) + " "
-                            + str(ysplmin) + "))"
+                            pol = ("POLYGON ((" + str(xsplmin) + " " +
+                                   str(ysplmin) + ", " + str(xsplmax) + " " +
+                                   str(ysplmin) + ", " + str(xsplmax) + " " +
+                                   str(ysplmax) + ", " + str(xsplmin) + " " +
+                                   str(ysplmax) + ", " + str(xsplmin) + " " +
+                                   str(ysplmin) + "))")
                             self.poly = QgsFeature()
                             self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                             self.temppolygon()
@@ -617,7 +616,7 @@ class gridSplitter:
                                                        "ogr")
                                 QgsMapLayerRegistry.instance().\
                                     addMapLayer(layer)
-                    self.cleanup()
+                            self.cleanup()
                     self.tileindex()
         os.close(self.errorfile)
         os.close(self.logfile)
@@ -627,7 +626,6 @@ class gridSplitter:
         """Tries to remove temporary files and map layers
         Only partially works, as on Windows there is FileLocks
         """
-        print(self.temp)
         QgsMapLayerRegistry.instance().removeMapLayers([self.gridtmp.id()])
         if os.path.isfile(self.temp):
                 QgsVectorFileWriter.deleteShapeFile(self.temp)
@@ -766,9 +764,9 @@ class gridSplitter:
                 if self.layertocut.type() == QgsMapLayer.RasterLayer:
                     self.Popenargs = [(self.gdalprefix + 'gdaltindex'),
                                       '-t_srs', self.epsg,
-                                      self.outputfolder +
-                                      os.sep + self.pref +
-                                      "tileindex.shp",
+                                      (self.outputfolder +
+                                       os.sep + self.pref +
+                                       "tileindex.shp"),
                                       file]
                     self.runPopen()
                     if self.layertocut.type() == QgsMapLayer.VectorLayer:
@@ -789,7 +787,10 @@ class gridSplitter:
             layer.startEditing()
             for feature in layer.getFeatures():
                 withoutextension = feature['location'].split('.')[-2]
-                withoutprefix = withoutextension.split(self.pref)[-1]
+                try:
+                    withoutprefix = withoutextension.split(self.pref)[-1]
+                except ValueError:
+                    withoutprefix = withoutextension.split(os.sep)[-1]
                 feature['col'] = withoutprefix.split('_')[0]
                 # we don't always have a row!
                 try:
@@ -797,7 +798,7 @@ class gridSplitter:
                 except IndexError:
                     pass
                 layer.updateFeature(feature)
-                layer.commitChanges()
+            layer.commitChanges()
 
     def runPopen(self):
         """Special treatment of windows, to avoid consoles popping up on
