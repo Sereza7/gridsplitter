@@ -20,11 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, 
-from PyQt4.QtCore import QFileInfo, QVariant
-from PyQt4.QtGui import QAction, QIcon, QMessageBox
-import resources_rc
-from gridSplitter_dialog import gridSplitterDialog
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtCore import QFileInfo, QVariant
+from PyQt5.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtGui import QIcon
+from . import resources_rc 
+from .gridSplitter_dialog import gridSplitterDialog
 from qgis.core import * 
 import os, os.path, processing, math, time, tempfile, sys
 from subprocess import call, CalledProcessError, check_output, PIPE, Popen
@@ -132,7 +133,7 @@ class gridSplitter:
         if self.of=="":
             QMessageBox.information(None, "Grid Splitter", 
                                     self.tr("Please specify output directory"))
-                return 0
+            return 0
                 
         if self.dlg.cutLayerRadio.isChecked(): 
             index = self.dlg.cutLayerBox.currentIndex()
@@ -140,7 +141,7 @@ class gridSplitter:
             if self.cutlayer == "": #check if cutlayer exists
                 QMessageBox.information(None,self.tr("No cut layer!"),
                                         self.tr("Please specify a cut layer"))
-                        return 0 
+                return 0 
         return 1
             
 
@@ -160,13 +161,11 @@ class gridSplitter:
      #fill layers:
      self.dlg.cutLayerBox.clear()
      self.dlg.inputRasterBox.clear()
-     layers = QgsMapLayerRegistry.instance().mapLayers().values()
+     layers = QgsProject.instance().mapLayers().values()
      for layer in layers:
          try:
-             if layer.dataProvider().description().startswith('GDAL') or
-             layer.dataProvider().description().startswith('OGR'): 
-                if layer.type() == QgsMapLayer.VectorLayer and 
-                layer.geometryType() == 2:
+             if layer.dataProvider().description().startswith('GDAL') or layer.dataProvider().description().startswith('OGR'): 
+                if layer.type() == QgsMapLayer.VectorLayer and layer.geometryType() == 2:
                     self.dlg.cutLayerBox.addItem( layer.name(), layer ) 
                 self.dlg.inputRasterBox.addItem(layer.name(), layer)
          except AttributeError:
@@ -234,7 +233,7 @@ class gridSplitter:
                             
                         #run for raster layer
                         if layertocut.type()== QgsMapLayer.RasterLayer:
-                            nodata = layertocut.dataProvider().srcNoDataValue(1)
+                            nodata = layertocut.dataProvider().sourceNoDataValue(1)
                             #TODO nadata values for other bands different?
                             self.epsg=self.layertocutcrs.toProj4()
                             newfile = folder+pref+str('%04d' %(i))+".tif"
@@ -259,13 +258,14 @@ class gridSplitter:
                                     + time.strftime('%X %x %Z')
                                     self.errorlog()
                             else:
-                                k= processing.runalg('gdalogr:cliprasterbymasklayer',
-                                                     layertocut, 
-                                                     self.temp,nodata, 
-                                                     False, 
-                                                     False,
-                                                     "-wo CUTLINE_ALL_TOUCHED=TRUE", 
-                                                     folder +pref + str('%04d' %(i))+ ".tif")
+                                parameters = {'INPUT': layertocut, 
+                                            'MASK':self.temp , 
+                                            'NO_DATA': nodata, 
+                                            'ALPHA_BAND': False, 
+                                            'KEEP_RESOLUTION': False, 
+                                            'EXTRA': "-wo CUTLINE_ALL_TOUCHED=TRUE",
+                                            'OUTPUT': folder +pref + str('%04d' %(i))+ ".tif"}
+                                k= processing.run('gdal:cliprasterbymasklayer', parameters)
                                 del k
                             if self.dlg.addTiles.isChecked()== True:
                                 #add raster layer to canvas
@@ -273,7 +273,7 @@ class gridSplitter:
                                 baseName = fileInfo.baseName()
                                 layer = QgsRasterLayer(folder +pref + str('%04d' %(i))+".tif", 
                                                        baseName)
-                                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                QgsProject.instance().addMapLayer(layer)
                         
                         else: #run for vector layer
                             if layertocut.type()== QgsMapLayer.VectorLayer:
@@ -296,16 +296,16 @@ class gridSplitter:
                                         + time.strftime('%X %x %Z')
                                         self.errorlog() 
                                 else:
-                                    k= processing.runalg('qgis:intersection', 
-                                                         layertocut, 
-                                                         self.gridtmp , 
-                                                         folder+ pref +str('%04d' %(i))+".shp")
+                                    parameters = {'INPUT': layertocut, 
+                                            'MASK':self.gridtmp , 
+                                            'OUTPUT': folder+ pref +str('%04d' %(i))+".shp"}
+                                    k= processing.run('qgis:intersection', parameters)
                                     del k
                                 if self.dlg.addTiles.isChecked()== True:
                                     layer = QgsVectorLayer(
                                         folder+ pref +str('%04d' %(i))+".shp" ,
                                         pref + str('%04d' %(i)), "ogr")
-                                    QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                    QgsProject.instance().addMapLayer(layer)
                     
                         self.cleanup()
                 self.tileindex()
@@ -339,7 +339,9 @@ class gridSplitter:
                         splicesY = int(math.ceil((ymax -ymin)/ float(ysplice)))
                 self.amount = splicesX * splicesY    
                 goon = self.warn()    
-                if goon == True:  
+                if goon == False:
+                    return
+                else:
                     #iterate
                     for i in range(splicesX):
                         for j in range(splicesY):
@@ -349,31 +351,22 @@ class gridSplitter:
                             xsplmax= xmin + (i+1)*xsplice
                             ysplmin= ymin + j*ysplice
                             ysplmax = ymin + (j+1)*ysplice
-                            pol= "POLYGON (("+str(xsplmin)
-                            +" "+str(ysplmin)+", "+str(xsplmax)+" "
-                            +str(ysplmin)+", "+str(xsplmax)+" "
-                            +str(ysplmax)+", "+str(xsplmin)+" "
-                            +str(ysplmax)+", "+str(xsplmin)+" 
-                            "+str(ysplmin)+ "))"
+                            pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
                             
                             self.poly = QgsFeature()
                             self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                             self.temppolygon()
                             
                             if self.dlg.subfolderRadio.isChecked():
-                                folder= self.of + os.sep 
-                                + str('%04d' %(i))+os.sep 
-                                + str('%04d' %(j))+ os.sep 
+                                folder= self.of + os.sep + str('%04d' %(i))+os.sep + str('%04d' %(j))+ os.sep 
                                 if not os.path.exists(folder): 
                                     os.makedirs(folder)
                                 self.subpath=2
                             if self.dlg.nosubfolderRadio.isChecked():
                                 folder = self.of+os.sep
                                 self.subpath=0
-                            nodata = layertocut.dataProvider().srcNoDataValue(1)
-                            newfile = folder
-                            +pref
-                            +str('%04d' %(i))+"_"+str('%04d' %(j))+".tif"
+                            nodata = layertocut.dataProvider().sourceNoDataValue(1)
+                            newfile = folder+pref+str('%04d' %(i))+"_"+str('%04d' %(j))+".tif"
                             if os.path.isfile(newfile):
                                 if existwarning == 0:
                                     existwarning = self.exists()
@@ -389,33 +382,25 @@ class gridSplitter:
                                                 lyrct_fp,newfile]
                                 errx=self.runPopen()
                                 if errx==1:
-                                    self.errmsg = "this error was created by "
-                                    +"gdalwarp at " + time.strftime('%X %x %Z')
+                                    self.errmsg = "this error was created by "+"gdalwarp at " + time.strftime('%X %x %Z')
                                     self.errorlog()
                             else:
-                                k= processing.runalg('gdalogr:cliprasterbymasklayer', 
-                                                     layertocut, 
-                                                     self.temp , 
-                                                     nodata, 
-                                                     False, 
-                                                     False, 
-                                                     "",
-                                                     folder +pref 
-                                                     + str('%04d' %(i))
-                                                     +"_"+str('%04d' %(j))+".tif")
+                                parameters = {'INPUT': layertocut, 
+                                            'MASK':self.temp , 
+                                            'NO_DATA': nodata, 
+                                            'ALPHA_BAND': False, 
+                                            'KEEP_RESOLUTION': False, 
+                                            'EXTRA': "",
+                                            'OUTPUT': folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif"}
+                                k= processing.run('gdal:cliprasterbymasklayer', parameters)
                                 del k
                             #add raster layer to canvas
                             if self.dlg.addTiles.isChecked()== True:
-                                fileInfo = QFileInfo(folder 
-                                                     +pref 
-                                                     + str('%04d' %(i))
-                                                     +"_"+str('%04d' %(j))+".tif")
+                                fileInfo = QFileInfo(folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif")
                                 baseName = fileInfo.baseName()
-                                layer = QgsRasterLayer(folder +pref 
-                                                       + str('%04d' %(i))+"_"
-                                                       +str('%04d' %(j))+".tif", 
+                                layer = QgsRasterLayer(folder +pref + str('%04d' %(i))+"_"+str('%04d' %(j))+".tif", 
                                                        baseName)
-                                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                QgsProject.instance().addMapLayer(layer)
                             
                             self.cleanup()
                     self.tileindex()
@@ -436,7 +421,9 @@ class gridSplitter:
                     
                     self.amount = splicesX*splicesY
                     goon = self.warn()
-                    if goon==True:
+                    if goon == False:
+                        return
+                    else:
                         #iterate
                         for i in range(splicesX):
                             for j in range(splicesY):
@@ -444,28 +431,20 @@ class gridSplitter:
                                 xsplmax= xmin + (i+1)*xsplice
                                 ysplmin= ymin + j*ysplice
                                 ysplmax = ymin + (j+1)*ysplice
-                                pol= "POLYGON (("+str(xsplmin)+" "
-                                +str(ysplmin)+", "+str(xsplmax)+" "
-                                +str(ysplmin)+", "+str(xsplmax)+" "
-                                +str(ysplmax)+", "+str(xsplmin)+" "
-                                +str(ysplmax)+", "+str(xsplmin)+" "
-                                +str(ysplmin)+ "))"
+                                pol= "POLYGON (("+str(xsplmin)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmin)+", "+str(xsplmax)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmax)+", "+str(xsplmin)+" "+str(ysplmin)+ "))"
                                 self.poly = QgsFeature()
                                 self.poly.setGeometry(QgsGeometry.fromWkt(pol))
                                 self.temppolygon()
                                 
                                 if self.dlg.subfolderRadio.isChecked():
-                                    folder= self.of + os.sep 
-                                    + str('%04d' %(i))+os.sep 
-                                    + str('%04d' %(j))+ os.sep
+                                    folder= self.of + os.sep + str('%04d' %(i))+os.sep + str('%04d' %(j))+ os.sep
                                     if not os.path.exists(folder):
                                         os.makedirs(folder) #make folders
                                     self.subpath=2
                                 if self.dlg.nosubfolderRadio.isChecked():
                                     folder= self.of+os.sep
                                     self.subpath=0
-                                newfile = folder+ pref +str('%04d' %(i))
-                                +"_"+str('%04d' %(j))+".shp"
+                                newfile = folder+ pref +str('%04d' %(i))+"_"+str('%04d' %(j))+".shp"
                                 if os.path.isfile(newfile):
                                     if existwarning == 0:
                                         existwarning = self.exists()
@@ -477,30 +456,19 @@ class gridSplitter:
                                                     newfile, lyrct_fp]
                                     errx=self.runPopen()
                                     if errx==1:
-                                        self.errmsg = "this error was created"
-                                        + "by ogr2ogr at " 
-                                        + time.strftime('%X %x %Z')
+                                        self.errmsg = "this error was created"+ "by ogr2ogr at " + time.strftime('%X %x %Z')
                                         self.errorlog()
                                 else: 
-                                    k= processing.runalg('qgis:intersection', 
-                                                         layertocut, 
-                                                         self.temp , 
-                                                         folder+ pref 
-                                                         +str('%04d' %(i))
-                                                         +"_"+ str('%04d' %(j))
-                                                         +".shp")
+                                    parameters = {'INPUT': layertocut, 
+                                            'MASK':self.temp , 
+                                            'OUTPUT': folder+ pref +str('%04d' %(i))+"_"+ str('%04d' %(j))+".shp"}
+                                    k= processing.run('qgis:intersection', parameters)
                                     del k
                                 if self.dlg.addTiles.isChecked()== True:
-                                    layer = QgsVectorLayer(folder
-                                                           + pref 
-                                                           +str('%04d' %(i))+"_"
-                                                           +str('%04d' %(j))
-                                                           +".shp", 
-                                                           pref 
-                                                           +str('%04d' %(i))+"_"
-                                                           +str('%04d' %(j)), 
+                                    layer = QgsVectorLayer(folder+ pref +str('%04d' %(i))+"_"+str('%04d' %(j))+".shp", 
+                                                           pref +str('%04d' %(i))+"_"+str('%04d' %(j)), 
                                                            "ogr")
-                                    QgsMapLayerRegistry.instance().addMapLayer(layer)
+                                    QgsProject.instance().addMapLayer(layer)
                                 self.cleanup()
                         self.tileindex()
         os.close(self.ef)
@@ -508,7 +476,7 @@ class gridSplitter:
         
         
     def cleanup(self):
-        #does not work on win7. runalg keeps them open
+        #does not work on win7. run keeps them open
         if os.path.isfile(self.temp): 
             QgsVectorFileWriter.deleteShapeFile(self.temp)
         cpg = self.temp[:-4]+ ".cpg"
@@ -537,8 +505,7 @@ class gridSplitter:
         del writer
         
     def warn(self):
-        message= self.tr("you are about to make up to ") 
-        + str(self.amount) + self.tr(" tiles. Continue?")
+        message= self.tr("you are about to make up to ") + str(self.amount) + self.tr(" tiles. Continue?")
         k = QMessageBox .question(None, "Grid Splitter", 
                                   message, 
                                   QMessageBox.Yes, 
@@ -546,12 +513,11 @@ class gridSplitter:
         if k == QMessageBox.Yes:
             return True
         else:
+            print("QMessageBox.Abort")
             return False
 
     def reprojectTempFile(self):
-        message= self.tr("The Cutlayer doesn't match the projection of the"
-                         +"layer to be cut. Should I try to reproject"
-                         + "(temporary file)?")
+        message= self.tr("The Cutlayer doesn't match the projection of the" +"layer to be cut. Should I try to reproject" + "(temporary file)?")
         k = QMessageBox .question(None, 
                                   "Grid Splitter", 
                                   message, 
@@ -581,15 +547,16 @@ class gridSplitter:
                     + time.strftime('%X %x %Z')
                     self.errorlog()
             else:
-                new= processing.runalg('qgis:reprojectlayer', 
-                                       self.cutlayer, 
-                                       self.epsg, 
-                                       None)
+                parameters = {'INPUT': self.cutlayer, 
+                                            'TARGET_CRS':self.epsg , 
+                                            'OUTPUT': None}
+                new= processing.run('qgis:reprojectlayer', parameters)
+                
                 self.cutlayer = QgsVectorLayer(new.get("OUTPUT"),
                                                "reprojected Cutlayer",
                                                "ogr")
                 del new
-            QgsMapLayerRegistry.instance().addMapLayer(self.cutlayer)
+            QgsProject.instance().addMapLayer(self.cutlayer)
 
     def exists(self):
       QMessageBox.information(None, self.tr("File exists"), 
@@ -599,7 +566,7 @@ class gridSplitter:
       return 1
       
     def checkgdal(self):
-    """checks if GDALWARP is in the %Path. Assuming, ogr2ogr is there, too"""
+        #checks if GDALWARP is in the %Path. Assuming, ogr2ogr is there, too
         try: 
             call(self.gdalprefix+'gdalwarp')
         except OSError:
@@ -650,7 +617,7 @@ class gridSplitter:
                         self.runPopen()
             layer = QgsVectorLayer(self.of+os.sep+pref+"tileindex.shp" ,
                                    pref+"tileindex", "ogr")
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            QgsProject.instance().addMapLayer(layer)
             
             layer.dataProvider().addAttributes([QgsField("row", QVariant.String,"",10),
                                                 QgsField("col",QVariant.String,"",10)])
@@ -667,7 +634,7 @@ class gridSplitter:
                     pass
                 layer.updateFeature(feature)
             d = layer.commitChanges()
-            print d
+            print(d)
             
     def runPopen(self):
         if os.name=="nt":
